@@ -143,8 +143,14 @@ public class JwtTokenBuilder {
 	 * Create a new JWT token
 	 * 
 	 * @return JWT token
+	 * 
+	 * @throws IllegalStateException if <tt>userId</tt> and <tt>roles</tt> are not provided
 	 */
 	public String build() {
-		return signer.sign(claims, options);			
+		if (claims.containsKey(JwtConstants.USER_ID) && claims.containsKey(JwtConstants.ROLES)) {
+			return signer.sign(claims, options);			
+		} else {
+			throw new IllegalStateException("userId and roles claims must be added!");
+		}
 	}
 }

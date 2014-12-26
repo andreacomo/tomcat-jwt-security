@@ -37,15 +37,8 @@ public class JwtTokenBuilderTest {
 		assertTrue(timeToExpire <= 10000);
 	}
 
-	@Test
-	public void shouldBeEmptyAndValid() throws Exception {
-		String token = JwtTokenBuilder.create(SECRET).build();
-		
-		assertNotNull(token);
-		
-		JWTVerifier verifier = new JWTVerifier(SECRET_BASE64);
-		Map<String, Object> tokenObject = verifier.verify(token);
-		
-		assertTrue(tokenObject.isEmpty());
+	@Test(expected=IllegalStateException.class)
+	public void shouldBeEmptyAndInvalid() throws Exception {
+		JwtTokenBuilder.create(SECRET).build();
 	}
 }
