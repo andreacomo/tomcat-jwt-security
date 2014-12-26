@@ -4,6 +4,7 @@ import it.cosenonjaviste.security.jwt.utils.JwtConstants;
 import it.cosenonjaviste.security.jwt.utils.JwtTokenVerifier;
 
 import java.io.IOException;
+import java.nio.file.attribute.UserPrincipal;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -14,6 +15,22 @@ import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.valves.ValveBase;
 
+/**
+ * Perform a JWT authentication on requester resource.
+ * 
+ * Expected a JWT token containing two additional claims over standard ones:
+ * <ul>
+ * 	<li><em>userId</em>: username authenticated by realm system</li>
+ * 	<li><em>roles</em>: realm roles associated to username</li>
+ * </ul>
+ * 
+ * A new {@link UserPrincipal} will be created upon <tt>userId</tt> and <tt>roles</tt> values: no need to authenticate each request, user status is provided by JWT token!
+ * <br />
+ * Expected header for JWT token is <strong><tt>X-Auth</tt></strong>
+ * 
+ * @author acomo
+ *
+ */
 public class JwtTokenValve extends ValveBase {
 
 	private String secret;
