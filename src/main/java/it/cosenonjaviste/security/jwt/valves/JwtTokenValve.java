@@ -17,6 +17,8 @@ import org.apache.catalina.valves.ValveBase;
 public class JwtTokenValve extends ValveBase {
 
 	private String secret;
+	
+	private boolean isBase64 = false;
 
 	@Override
 	public void invoke(Request request, Response response) throws IOException,
@@ -47,7 +49,7 @@ public class JwtTokenValve extends ValveBase {
 
 		String token = request.getHeader(JwtConstants.AUTH_HEADER);
 		if (token != null) {
-			JwtTokenVerifier tokenVerifier = JwtTokenVerifier.create(secret, false);
+			JwtTokenVerifier tokenVerifier = JwtTokenVerifier.create(secret, isBase64);
 			if (tokenVerifier.verify(token)) {
 				request.setUserPrincipal(createPrincipalFromToken(tokenVerifier));
 				request.setAuthType("TOKEN");
@@ -70,4 +72,7 @@ public class JwtTokenValve extends ValveBase {
 		this.secret = secret;
 	}
 
+	public void setBase64(boolean isBase64) {
+		this.isBase64 = isBase64;
+	}
 }
