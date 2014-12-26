@@ -8,8 +8,6 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.Container;
-import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.SecurityConstraint;
@@ -18,8 +16,6 @@ import org.apache.catalina.valves.ValveBase;
 
 public class JwtTokenValve extends ValveBase {
 
-	private Context context;
-
 	private String secret;
 
 	@Override
@@ -27,9 +23,9 @@ public class JwtTokenValve extends ValveBase {
 			ServletException {
 
 		SecurityConstraint[] constraints = this.container.getRealm()
-				.findSecurityConstraints(request, this.context);
+				.findSecurityConstraints(request, request.getContext());
 
-		if ((constraints == null && !context.getPreemptiveAuthentication())
+		if ((constraints == null && !request.getContext().getPreemptiveAuthentication())
 				|| !hasAuthContraint(constraints)) {
 			this.getNext().invoke(request, response); 
 		} else {
@@ -70,30 +66,8 @@ public class JwtTokenValve extends ValveBase {
 		return new GenericPrincipal(tokenVerifier.getUserId(), null, tokenVerifier.getRoles());
 	}
 
-	/**
-	 * Set the Container to which this Valve is attached.
-	 *
-	 * @param container
-	 *            The container to which we are attached
-	 */
-	@Override
-	public void setContainer(Container container) {
-
-		if (container != null && !(container instanceof Context))
-			throw new IllegalArgumentException(
-					sm.getString("authenticator.notContext"));
-
-		super.setContainer(container);
-		this.context = (Context) container;
-
-	}
-
 	public void setSecret(String secret) {
 		this.secret = secret;
-	}
-
-	public void setContext(Context context) {
-		this.context = context;
 	}
 
 }
