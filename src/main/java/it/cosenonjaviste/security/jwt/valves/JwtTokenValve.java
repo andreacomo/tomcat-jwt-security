@@ -1,5 +1,7 @@
 package it.cosenonjaviste.security.jwt.valves;
 
+import it.cosenonjaviste.security.jwt.catalinawriters.ResponseWriter;
+import it.cosenonjaviste.security.jwt.model.AuthErrorResponse;
 import it.cosenonjaviste.security.jwt.utils.JwtConstants;
 import it.cosenonjaviste.security.jwt.utils.JwtTokenVerifier;
 
@@ -72,17 +74,20 @@ public class JwtTokenValve extends ValveBase {
 				request.setAuthType("TOKEN");
 				this.getNext().invoke(request, response);
 			} else {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-						"Token not valid. Please login first");
+				sendUnauthorizedError(request, response, "Token not valid. Please login first");
 			}
 		} else {
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-					"Please login first");
+			sendUnauthorizedError(request, response, "Please login first");
 		}
 	}
 
+
 	private GenericPrincipal createPrincipalFromToken(JwtTokenVerifier tokenVerifier) {
 		return new GenericPrincipal(tokenVerifier.getUserId(), null, tokenVerifier.getRoles());
+	}
+
+	protected void sendUnauthorizedError(Request request, Response response, String message) throws IOException {
+		ResponseWriter.get(request.getHeader("accept")).write(response, HttpServletResponse.SC_UNAUTHORIZED, new AuthErrorResponse(message));
 	}
 
 	public void setSecret(String secret) {

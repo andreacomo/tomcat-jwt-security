@@ -18,7 +18,7 @@ import com.auth0.jwt.internal.org.apache.commons.codec.binary.Base64;
 /**
  * Helper class for simplifying token verification procedure.
  * 
- * This class provides convenient methods to access <tt>userId</tt> and <tt>roles</tt> claims values.
+ * This class provides convenience methods to access <tt>userId</tt> and <tt>roles</tt> claims values.
  * If not present, an {@link IllegalStateException} is thrown
  * 
  * These values are mandatory in order to create {@link UserPrincipal} for each request
@@ -80,7 +80,7 @@ public class JwtTokenVerifier {
 	}
 	
 	/**
-	 * Convenient method to retrieve <tt>userId</tt> value from token claim
+	 * Convenience method to retrieve <tt>userId</tt> value from token claim
 	 * 
 	 * @return <tt>userId</tt> value
 	 * 
@@ -95,7 +95,7 @@ public class JwtTokenVerifier {
 	}
 	
 	/**
-	 * Convenient method to retrieve <tt>roles</tt> value from token claim
+	 * Convenience method to retrieve <tt>roles</tt> value from token claim
 	 * 
 	 * @return <tt>roles</tt> value collection
 	 * 
