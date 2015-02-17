@@ -46,7 +46,7 @@
 		<to.deploy.dir>${project.build.directory}/to-deploy</to.deploy.dir>
 
 		<tomcat.version>7.0.57</tomcat.version>
-		<jwt.version>1.0.0</jwt.version>
+		<jwt.version>2.0.1</jwt.version>
 		<commons.codec.version>1.4</commons.codec.version>
 		<junit.version>4.8.2</junit.version>
 	</properties>

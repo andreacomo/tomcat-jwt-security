@@ -3,13 +3,14 @@ This project aims to bring JWT token authentication capabilities into Tomcat, im
 Valve-based authentication is supposed to work along with Java **standard security constraints** placed in your *web.xml* file and will leave your server **stateless**: with a JWT token you can keep your Tomcat free of http session.
 
 # Getting started
-You can download artifacts or build the project on your own, then configure Tomcat and your security constraints in your project to enable authentication system. 
+You can download artifacts (1.a) or build the project on your own (1.b), then configure Tomcat and your security constraints in your project to enable authentication system. 
+
+Finally, read how to create tokens in your app.
 
 ## 1.a Download artifacts
-Download artifacts (project and dependencies) from repo releases containing
-* tomcat-jwt-security-1.0.0.jar
-* java-jwt-1.0.0.jar
-* commons-codec-1.4.jar
+Download artifacts (project and dependencies) from Maven Central Repo
+* [tomcat-jwt-security-1.0.0.jar](https://repo1.maven.org/maven2/it/cosenonjaviste/tomcat-jwt-security/1.0.0/tomcat-jwt-security-1.0.0.jar)
+* [java-jwt-2.0.1.jar](https://repo1.maven.org/maven2/com/auth0/java-jwt/2.0.1/java-jwt-2.0.1.jar)
 
 and place into *TOMCAT_HOME/lib* directory
 
@@ -27,13 +28,11 @@ Now register **`JwtTokenValve`** in Tomcat configuration file.
 
 ```xml
 <Valve className="it.cosenonjaviste.security.jwt.valves.JwtTokenValve" 
-	  		 secret="my super secret password"
-	  		 base64="false"/>
+	  		 secret="my super secret password" />
 ```
 
 where:
 * ***secret***: is secret passphrase for signing token
-* ***base64***: must be set to *true* if *secret* is base64 encoded. Sign system must know how to treat provided password.
 
 In order for the valve to work, a **realm shoul be provided**. An example for a JDBCRealm can be found on [a post on TheJavaGeek](http://www.thejavageek.com/2013/07/07/configure-jdbcrealm-jaas-for-mysql-and-tomcat-7-with-form-based-authentication/)
 

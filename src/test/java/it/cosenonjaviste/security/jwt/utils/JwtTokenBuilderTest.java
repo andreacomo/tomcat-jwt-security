@@ -1,22 +1,20 @@
 package it.cosenonjaviste.security.jwt.utils;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 
 import org.junit.Test;
 
 import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.internal.org.apache.commons.codec.binary.Base64;
 
 public class JwtTokenBuilderTest {
 
 	private static final String SECRET = "my secret";
 	
-	private static final String SECRET_BASE64 = Base64.encodeBase64String(SECRET.getBytes(StandardCharsets.UTF_8));
-
 	@Test
 	public void shouldContains3Claims() throws Exception {
 		JwtTokenBuilder builder = JwtTokenBuilder.create(SECRET);
@@ -24,7 +22,7 @@ public class JwtTokenBuilderTest {
 		
 		assertNotNull(token);
 		
-		JWTVerifier verifier = new JWTVerifier(SECRET_BASE64);
+		JWTVerifier verifier = new JWTVerifier(SECRET);
 		Map<String, Object> tokenObject = verifier.verify(token);
 		
 		assertNotNull(tokenObject);

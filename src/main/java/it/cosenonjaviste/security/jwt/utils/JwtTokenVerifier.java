@@ -1,7 +1,6 @@
 package it.cosenonjaviste.security.jwt.utils;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.attribute.UserPrincipal;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -13,7 +12,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.internal.org.apache.commons.codec.binary.Base64;
+import com.auth0.jwt.JWTVerifyException;
 
 /**
  * Helper class for simplifying token verification procedure.
@@ -42,17 +41,12 @@ public class JwtTokenVerifier {
 	 * Creates a new instance of {@link JwtTokenVerifier} class
 	 * 
 	 * @param secret secret phrase
-	 * @param isBase64 is secret phrase base64 encoded?
 	 * 
 	 * @return a new instance of {@link JwtTokenVerifier} class
 	 */
-	public static JwtTokenVerifier create(String secret, boolean isBase64) {
+	public static JwtTokenVerifier create(String secret) {
 		JwtTokenVerifier tokenVerifier = new JwtTokenVerifier();
-		if (isBase64) {
-			tokenVerifier.verifier = new JWTVerifier(secret); 
-		} else {
-			tokenVerifier.verifier = new JWTVerifier(Base64.encodeBase64String(secret.getBytes(StandardCharsets.UTF_8)));
-		}
+		tokenVerifier.verifier = new JWTVerifier(secret); 
 		
 		return tokenVerifier;
 	}
@@ -75,6 +69,9 @@ public class JwtTokenVerifier {
 
 		} catch (NoSuchAlgorithmException | IOException e) {
 			LOG.info("Unable to parse token, caused by: " + e.getMessage(), e);
+			return false;
+		} catch (JWTVerifyException e) {
+			LOG.info("Unable to verify token, caused by: " + e.getMessage(), e);
 			return false;
 		}
 	}

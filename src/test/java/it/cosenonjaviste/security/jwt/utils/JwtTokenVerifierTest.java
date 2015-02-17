@@ -1,6 +1,8 @@
 package it.cosenonjaviste.security.jwt.utils;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,13 +30,13 @@ public class JwtTokenVerifierTest {
 	
 	@Test
 	public void testVerfiy() {
-		JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET, false);
+		JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
 		assertTrue(verifier.verify(token));
 	}
 	
 	@Test
 	public void testGetUserId() {
-		JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET, false);
+		JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
 		
 		assertTrue(verifier.verify(token));
 		assertNotNull(verifier.getUserId());
@@ -43,7 +45,7 @@ public class JwtTokenVerifierTest {
 	
 	@Test
 	public void testGetRoles() {
-		JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET, false);
+		JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
 		
 		assertTrue(verifier.verify(token));
 		assertNotNull(verifier.getRoles());
@@ -53,7 +55,7 @@ public class JwtTokenVerifierTest {
 	
 	@Test(expected = IllegalStateException.class)
 	public void shouldThrowIllegalStateException() throws Exception {
-		JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET, false);
+		JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
 		
 		assertNotNull(verifier.getUserId());
 	}
