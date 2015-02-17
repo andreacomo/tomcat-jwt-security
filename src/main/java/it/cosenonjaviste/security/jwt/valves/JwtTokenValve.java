@@ -27,7 +27,7 @@ import org.apache.catalina.valves.ValveBase;
  * </ul>
  * 
  * A new {@link UserPrincipal} will be created upon <tt>userId</tt> and <tt>roles</tt> values: no need to authenticate each request, user status is provided by JWT token!
- * <br />
+ * <br>
  * Expected header for JWT token is <strong><tt>X-Auth</tt></strong>
  * 
  * @author acomo
