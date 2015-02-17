@@ -25,9 +25,9 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:git@github.com:cosenonjaviste/tomcat-jwt-security.git</connection>
-		<developerConnection>scm:git:git@github.com:cosenonjaviste/tomcat-jwt-security.git</developerConnection>
-		<url>git@github.com:cosenonjaviste/tomcat-jwt-security.git</url>
+		<connection>scm:git:git@github.com/tomcat-jwt-security.git</connection>
+		<developerConnection>scm:git:git@github.com/tomcat-jwt-security.git</developerConnection>
+		<url>git@github.com/tomcat-jwt-security.git</url>
 	</scm>
 
 	<distributionManagement>
