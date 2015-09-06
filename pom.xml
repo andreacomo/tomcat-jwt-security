@@ -6,7 +6,7 @@
 
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>JWT Tomcat Valve and utility classes for handling JWT tokens</description>
-	<url>https://github.com/cosenonjaviste/tomcat-jwt-security</url>
+	<url>https://github.com/andreacomo/tomcat-jwt-security</url>
 
 	<licenses>
 		<license>
@@ -24,9 +24,9 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:https://github.com/cosenonjaviste/tomcat-jwt-security.git</connection>
-		<developerConnection>scm:git:https://github.com/cosenonjaviste/tomcat-jwt-security.git</developerConnection>
-		<url>https://github.com/cosenonjaviste/tomcat-jwt-security.git</url>
+		<connection>scm:git:https://github.com/andreacomo/tomcat-jwt-security.git</connection>
+		<developerConnection>scm:git:https://github.com/andreacomo/tomcat-jwt-security.git</developerConnection>
+		<url>https://github.com/andreacomo/tomcat-jwt-security.git</url>
 	  <tag>HEAD</tag>
   </scm>
 
@@ -46,7 +46,7 @@
 		<to.deploy.dir>${project.build.directory}/to-deploy</to.deploy.dir>
 
 		<tomcat.version>7.0.57</tomcat.version>
-		<jwt.version>2.0.1</jwt.version>
+		<jwt.version>2.1.0</jwt.version>
 		<commons.codec.version>1.4</commons.codec.version>
 		<junit.version>4.8.2</junit.version>
 	</properties>
