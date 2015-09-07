@@ -18,6 +18,14 @@ import com.auth0.jwt.JWTSigner.Options;
  */
 public class JwtTokenBuilder {
 	
+	private static final String NOT_BEFORE = "nbf";
+
+	private static final String JWT_ID = "jti";
+
+	private static final String EXPIRE = "exp";
+
+	private static final String ISSUED_AT = "iat";
+
 	private JWTSigner signer;
 	
 	private Map<String, Object> claims = new HashMap<>();
@@ -38,10 +46,115 @@ public class JwtTokenBuilder {
 	public static JwtTokenBuilder create(String secret) {
 		JwtTokenBuilder builder = new JwtTokenBuilder();
 		builder.signer = new JWTSigner(secret); 
+		builder.options.setIssuedAt(true);
 		
 		return builder;
 	}
 	
+	/**
+	 * Creates a {@link JwtTokenBuilder} instance from token and secret.
+	 * <br >
+	 * Token will be <strong>validated</strong> before parsing.
+	 * <br >
+	 * Token <strong>must</strong> contains "<em>iat</em>" param in order to restore builder status
+	 * <br >
+	 * <br >
+	 * Rebuilding this token has side effect:
+	 * <ul>
+	 * <li>if "<em>jti</em>" param is present, will be overwritten</li> 
+	 * <li>if "<em>exp</em>" param is present, expire time will be recalculated starting from current timestamp</li> 
+	 * <li>if "<em>nbf</em>" param is present, its value will be recalculated starting from current timestamp</li> 
+	 * </ul>
+	 * 
+	 * @param token
+	 * @param secret
+	 * @return
+	 */
+	public static JwtTokenBuilder from(String token, String secret) {
+		JwtTokenVerifier verifier = JwtTokenVerifier.create(secret);
+		verifier.verify(token);
+		return from(verifier, secret);
+	}
+
+	/**
+	 * Creates a {@link JwtTokenBuilder} instance from token and secret.
+	 * <br >
+	 * Token <strong>must</strong> contains "<em>iat</em>" param in order to restore builder status
+	 * <br >
+	 * Use this method if you want to edit current token: if "<em>jti</em>" param is present, will be overwritten 
+	 * <br >
+	 * Token <strong>must</strong> be verified before calling this method
+	 * <br >
+	 * <br >
+	 * Rebuilding this token has side effect:
+	 * <ul>
+	 * <li>if "<em>jti</em>" param is present, will be overwritten</li> 
+	 * <li>if "<em>exp</em>" param is present, expire time will be recalculated starting from current timestamp</li> 
+	 * <li>if "<em>nbf</em>" param is present, its value will be recalculated starting from current timestamp</li> 
+	 * </ul>
+	 * 
+	 * @param verifier
+	 * @param secret
+	 * @return
+	 * 
+	 * @throws IllegalStateException if token is not verified by provided verifier
+	 */
+	public static JwtTokenBuilder from(JwtTokenVerifier verifier, String secret) {
+		JwtTokenBuilder builder = create(secret);
+		Map<String, Object> verifiedClaims = verifier.getClaims();
+		restoreInternalStatus(builder, verifiedClaims);
+		return builder;
+	}
+
+	/**
+	 * Creates a {@link JwtTokenBuilder} instance from token and secret.
+	 * <br >
+	 * Token will be <strong>validated</strong> before parsing.
+	 * <br >
+	 * Token <strong>must</strong> contains "<em>iat</em>" param in order to restore builder status
+	 * <br >
+	 * Use this method if you want to edit current token: if "<em>jti</em>" param is present, will be overwritten 
+	 * <br >
+	 * <br >
+	 * Rebuilding this token has side effect:
+	 * <ul>
+	 * <li>if "<em>jti</em>" param is present, will be overwritten</li> 
+	 * <li>if "<em>exp</em>" param is present, expire time will be recalculated starting from current timestamp</li> 
+	 * <li>if "<em>nbf</em>" param is present, its value will be recalculated starting from current timestamp</li> 
+	 * </ul>
+	 * @param verifier
+	 * @param token
+	 * @param secret
+	 * @return
+	 * 
+	 * @throws IllegalStateException if token is not verified by provided verifier
+	 */
+	public static JwtTokenBuilder from(JwtTokenVerifier verifier, String token, String secret) {
+		verifier.verify(token);
+		return from(verifier, secret);
+	}
+	
+	private static void restoreInternalStatus(JwtTokenBuilder builder, Map<String, Object> verifiedClaims) {
+		if (verifiedClaims.containsKey(ISSUED_AT)) {
+			int issuedAt = (int) verifiedClaims.remove(ISSUED_AT);
+			if (verifiedClaims.containsKey(EXPIRE)) {
+				int expire = (int) verifiedClaims.remove(EXPIRE) - issuedAt;
+				builder.options.setExpirySeconds(expire);
+			}
+			if (verifiedClaims.containsKey(NOT_BEFORE)) {
+				int notBefore = (int) verifiedClaims.remove(NOT_BEFORE) + issuedAt;
+				builder.options.setNotValidBeforeLeeway(notBefore);
+			}
+			if (verifiedClaims.containsKey(JWT_ID)) {
+				verifiedClaims.remove(JWT_ID);
+				builder.options.setJwtId(true);
+			}
+			builder.claims.putAll(verifiedClaims);
+		} else {
+			throw new IllegalStateException("Missing 'iat' value. Unable to restore builder status");
+		}
+	}
+
 	/**
 	 * Add <tt>userId</tt> claim to JWT body
 	 * 

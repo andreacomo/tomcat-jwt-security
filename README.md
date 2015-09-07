@@ -28,11 +28,13 @@ Now register **`JwtTokenValve`** in Tomcat configuration file.
 
 ```xml
 <Valve className="it.cosenonjaviste.security.jwt.valves.JwtTokenValve" 
-	  		 secret="my super secret password" />
+	  		 secret="my super secret password"
+	  		 updateExpire="true" />
 ```
 
 where:
 * ***secret***: is secret passphrase for signing token
+* ***updateExpire***: (default **false**) ***resends*** token to client on each response with expire time updated to last request
 
 In order for the valve to work, a **realm shoul be provided**. An example for a JDBCRealm can be found on [a post on TheJavaGeek](http://www.thejavageek.com/2013/07/07/configure-jdbcrealm-jaas-for-mysql-and-tomcat-7-with-form-based-authentication/)
 
@@ -73,7 +75,7 @@ You can use classes provided by *[java-jwt project](https://github.com/auth0/jav
 <dependency>
 	<groupId>it.cosenonjaviste</groupId>
 	<artifactId>tomcat-jwt-security</artifactId>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<scope>provided</scope>
 </dependency>
 ```

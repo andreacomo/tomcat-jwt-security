@@ -106,4 +106,17 @@ public class JwtTokenVerifier {
 			throw new IllegalStateException("Please call verify method first!");
 		}
 	}
+	
+	/**
+	 * Return validated claims. For internal use only!
+	 * 
+	 * @return
+	 */
+	Map<String, Object> getClaims() {
+		if (this.claims != null) {
+			return this.claims;
+		} else {
+			throw new IllegalStateException("Please call verify method first!");
+		}
+	}
 }

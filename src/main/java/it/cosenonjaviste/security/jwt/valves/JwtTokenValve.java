@@ -3,6 +3,7 @@ package it.cosenonjaviste.security.jwt.valves;
 import it.cosenonjaviste.security.jwt.catalinawriters.ResponseWriter;
 import it.cosenonjaviste.security.jwt.model.AuthErrorResponse;
 import it.cosenonjaviste.security.jwt.utils.JwtConstants;
+import it.cosenonjaviste.security.jwt.utils.JwtTokenBuilder;
 import it.cosenonjaviste.security.jwt.utils.JwtTokenVerifier;
 
 import java.io.IOException;
@@ -36,6 +37,8 @@ import org.apache.catalina.valves.ValveBase;
 public class JwtTokenValve extends ValveBase {
 
 	private String secret;
+	
+	private boolean updateExpire;
 	
 	@Override
 	public void invoke(Request request, Response response) throws IOException,
@@ -71,6 +74,9 @@ public class JwtTokenValve extends ValveBase {
 				request.setUserPrincipal(createPrincipalFromToken(tokenVerifier));
 				request.setAuthType("TOKEN");
 				this.getNext().invoke(request, response);
+				if (this.updateExpire) {
+					updateToken(tokenVerifier, response);
+				}
 			} else {
 				sendUnauthorizedError(request, response, "Token not valid. Please login first");
 			}
@@ -79,6 +85,10 @@ public class JwtTokenValve extends ValveBase {
 		}
 	}
 
+	private void updateToken(JwtTokenVerifier tokenVerifier, Response response) {
+		String newToken = JwtTokenBuilder.from(tokenVerifier, secret).build();
+		response.setHeader(JwtConstants.AUTH_HEADER, newToken);
+	}
 
 	private GenericPrincipal createPrincipalFromToken(JwtTokenVerifier tokenVerifier) {
 		return new GenericPrincipal(tokenVerifier.getUserId(), null, tokenVerifier.getRoles());
@@ -90,5 +100,14 @@ public class JwtTokenValve extends ValveBase {
 
 	public void setSecret(String secret) {
 		this.secret = secret;
+	}
+	
+	/**
+	 * Updates expire time on each request
+	 * 
+	 * @param updateExpire
+	 */
+	public void setUpdateExpire(boolean updateExpire) {
+		this.updateExpire = updateExpire;
 	}
 }
