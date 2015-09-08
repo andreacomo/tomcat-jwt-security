@@ -80,10 +80,14 @@ You can use classes provided by *[java-jwt project](https://github.com/auth0/jav
 </dependency>
 ```
 
-And use like this:
+And use like this in your *login controller*:
 ```java
 JwtTokenBuilder tokenBuilder = JwtTokenBuilder.create("my super secret password");
 String token = tokenBuilder.userId(securityContext.getUserPrincipal().getName()).roles(Arrays.asList("admin", "devop")).expirySecs(1800).build();
+
+...
+
+response.addHeader(JwtConstants.AUTH_HEADER, token);  
 ```
 
 Enjoy your stateless security system on Tomcat!!
