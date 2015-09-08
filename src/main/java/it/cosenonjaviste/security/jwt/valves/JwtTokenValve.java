@@ -73,10 +73,10 @@ public class JwtTokenValve extends ValveBase {
 			if (tokenVerifier.verify(token)) {
 				request.setUserPrincipal(createPrincipalFromToken(tokenVerifier));
 				request.setAuthType("TOKEN");
-				this.getNext().invoke(request, response);
 				if (this.updateExpire) {
 					updateToken(tokenVerifier, response);
 				}
+				this.getNext().invoke(request, response);
 			} else {
 				sendUnauthorizedError(request, response, "Token not valid. Please login first");
 			}
