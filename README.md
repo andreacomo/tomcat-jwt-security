@@ -1,5 +1,5 @@
 # tomcat-jwt-security
-This project aims to bring JWT token authentication capabilities into Tomcat, implementing an authentication filter as a Tomcat valve, based on [java-jwt](https://github.com/auth0/java-jwt) project.
+This project aims to bring JWT token authentication capabilities into **Tomcat 8**, implementing an authentication filter as a Tomcat valve, based on [java-jwt](https://github.com/auth0/java-jwt) project.
 Valve-based authentication is supposed to work along with Java **standard security constraints** placed in your *web.xml* file and will leave your server **stateless**: with a JWT token you can keep your Tomcat free of http session.
 
 # Getting started
@@ -9,7 +9,7 @@ Finally, read how to create tokens in your app.
 
 ## 1.a Download artifacts
 Download artifacts (project and dependencies) from Maven Central Repo
-* [tomcat-jwt-security-1.1.0.jar](https://repo1.maven.org/maven2/it/cosenonjaviste/tomcat-jwt-security/1.1.0/tomcat-jwt-security-1.1.0.jar)
+* [tomcat8-jwt-security-1.0.0.jar](https://repo1.maven.org/maven2/it/cosenonjaviste/tomcat-jwt-security/1.1.0/tomcat8-jwt-security-1.0.0.jar)
 * [java-jwt-2.0.1.jar](https://repo1.maven.org/maven2/com/auth0/java-jwt/2.1.0/java-jwt-2.1.0.jar)
 
 and place into *TOMCAT_HOME/lib* directory
@@ -74,8 +74,8 @@ You can use classes provided by *[java-jwt project](https://github.com/auth0/jav
 ```xml
 <dependency>
 	<groupId>it.cosenonjaviste</groupId>
-	<artifactId>tomcat-jwt-security</artifactId>
-	<version>1.1.0</version>
+	<artifactId>tomcat8-jwt-security</artifactId>
+	<version>1.0.0</version>
 	<scope>provided</scope>
 </dependency>
 ```

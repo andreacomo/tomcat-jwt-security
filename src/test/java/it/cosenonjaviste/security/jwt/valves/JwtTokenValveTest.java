@@ -1,5 +1,6 @@
 package it.cosenonjaviste.security.jwt.valves;
 
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import it.cosenonjaviste.security.jwt.utils.JwtConstants;
 import it.cosenonjaviste.security.jwt.utils.JwtTokenBuilder;
@@ -13,7 +14,7 @@ import org.apache.catalina.Realm;
 import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.deploy.SecurityConstraint;
+import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
