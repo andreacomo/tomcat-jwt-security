@@ -1,7 +1,8 @@
 # tomcat-jwt-security
 This project aims to bring JWT token authentication capabilities into **Tomcat 8**, implementing an authentication filter as a Tomcat valve, based on [java-jwt](https://github.com/auth0/java-jwt) project.
 
-For Tomcat 7, please use [version 1.1.0](https://github.com/andreacomo/tomcat-jwt-security/releases/tag/tomcat-jwt-security-1.1.0)
+For Tomcat 7, please use [version 1.1.0](https://github.com/andreacomo/tomcat-jwt-security/releases/tag/tomcat-jwt-security-1.1.0) or clone [master branch](https://github.com/andreacomo/tomcat-jwt-security/tree/tomcat-8).
+
 Valve-based authentication is supposed to work along with Java **standard security constraints** placed in your *web.xml* file and will leave your server **stateless**: with a JWT token you can keep your Tomcat free of http session.
 
 # Getting started
