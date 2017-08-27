@@ -142,7 +142,7 @@ public class JwtTokenBuilder {
 				builder.options.setExpirySeconds(expire);
 			}
 			if (verifiedClaims.containsKey(NOT_BEFORE)) {
-				int notBefore = (int) verifiedClaims.remove(NOT_BEFORE) + issuedAt;
+				int notBefore = issuedAt - (int) verifiedClaims.remove(NOT_BEFORE);
 				builder.options.setNotValidBeforeLeeway(notBefore);
 			}
 			if (verifiedClaims.containsKey(JWT_ID)) {

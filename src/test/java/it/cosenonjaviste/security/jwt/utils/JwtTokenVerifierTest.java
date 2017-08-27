@@ -29,7 +29,7 @@ public class JwtTokenVerifierTest {
 	}
 	
 	@Test
-	public void testVerfiy() {
+	public void testVerify() {
 		JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
 		assertTrue(verifier.verify(token));
 	}
