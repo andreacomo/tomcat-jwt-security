@@ -3,6 +3,7 @@ package it.cosenonjaviste.security.jwt.utils;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -84,6 +85,32 @@ public class JwtTokenBuilderTest {
 		int secondExpire = getExp(verifier, token);
 		
 		assertTrue(secondExpire >= firstExpire + 2);
+	}
+
+	@Test
+	public void shouldRecalculateNotBeforeClaimCorrectly() {
+		String token = createToken();
+
+		JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
+		verifier.verify(token);
+		Integer nbf = (Integer) verifier.getClaims().get("nbf");
+		Integer exp = getExp(verifier, token);
+
+		assertNotNull(nbf);
+		assertTrue((new Date().getTime() / 1000) > nbf);
+		assertNotNull(exp);
+		assertTrue((new Date().getTime() / 1000) < exp);
+
+		JwtTokenBuilder tokenBuilder = JwtTokenBuilder.from(verifier, SECRET);
+		String recreatedToken = tokenBuilder.build();
+
+		verifier = JwtTokenVerifier.create(SECRET);
+		verifier.verify(recreatedToken);
+		Integer recreatedNbf = (Integer) verifier.getClaims().get("nbf");
+		Integer recreatedExp = getExp(verifier, token);
+
+		assertEquals(exp, recreatedExp);
+		assertEquals((float) nbf, (float) recreatedNbf, 1);
 	}
 
 	private int getExp(JwtTokenVerifier verifier, String token) {
