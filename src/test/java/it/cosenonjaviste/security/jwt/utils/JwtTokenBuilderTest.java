@@ -97,9 +97,10 @@ public class JwtTokenBuilderTest {
 		Integer exp = getExp(verifier, token);
 
 		assertNotNull(nbf);
-		assertTrue((new Date().getTime() / 1000) > nbf);
+		long nowInSecs = new Date().getTime() / 1000;
+		assertTrue(nowInSecs > nbf);
 		assertNotNull(exp);
-		assertTrue((new Date().getTime() / 1000) < exp);
+		assertTrue(nowInSecs < exp);
 
 		JwtTokenBuilder tokenBuilder = JwtTokenBuilder.from(verifier, SECRET);
 		String recreatedToken = tokenBuilder.build();
