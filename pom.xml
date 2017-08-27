@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>it.cosenonjaviste</groupId>
 	<artifactId>tomcat-jwt-security</artifactId>
-	<version>2.0.1-SNAPSHOT</version>
+	<version>2.0.1</version>
 
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>JWT Tomcat Valve and utility classes for handling JWT tokens</description>
@@ -27,7 +27,7 @@
 		<connection>scm:git:https://github.com/andreacomo/tomcat-jwt-security.git</connection>
 		<developerConnection>scm:git:https://github.com/andreacomo/tomcat-jwt-security.git</developerConnection>
 		<url>https://github.com/andreacomo/tomcat-jwt-security.git</url>
-		<tag>HEAD</tag>
+		<tag>2.0.1</tag>
 	</scm>
 
 	<distributionManagement>
