@@ -96,3 +96,69 @@ response.addHeader(JwtConstants.AUTH_HEADER, token);
 ```
 
 Enjoy your stateless security system on Tomcat!!
+
+# JWT Valve and Spring Boot
+If you want to use this Valve with **Embedded Tomcat** provided by *Spring Boot*, forget about `web.xml` or `context.xml`!
+Just implement a `EmbeddedServletContainerCustomizer` like this:
+
+```java
+@Configuration
+public class TomcatJwtSecurityConfig implements EmbeddedServletContainerCustomizer {
+
+    @Override
+    public void customize(ConfigurableEmbeddedServletContainer container) {
+        if (container instanceof TomcatEmbeddedServletContainerFactory) {
+            TomcatEmbeddedServletContainerFactory factory = (TomcatEmbeddedServletContainerFactory) container;
+            factory.addContextValves(newJwtTokenValve());
+            factory.addContextValves(new BasicAuthenticator());
+            factory.addContextCustomizers(context -> {
+                context.setRealm(newJdbcRealm());
+
+                // replace web.xml entries
+                context.addConstraint(unsecured());
+                context.addConstraint(secured());
+                context.addSecurityRole("admin");
+                context.addSecurityRole("devop");
+            });
+        }
+    }
+
+    private SecurityConstraint unsecured() {
+        SecurityCollection collection = new SecurityCollection("login", "login");
+        collection.addPattern("/api/login");
+
+        SecurityConstraint securityConstraint = new SecurityConstraint();
+        securityConstraint.addCollection(collection);
+
+        return securityConstraint;
+    }
+
+    private SecurityConstraint secured() {
+        SecurityCollection collection = new SecurityCollection("api", "api");
+        collection.addPattern("/api/*");
+
+        SecurityConstraint securityConstraint = new SecurityConstraint();
+        securityConstraint.addAuthRole("*");
+        securityConstraint.setAuthConstraint(true);
+        securityConstraint.addCollection(collection);
+
+        return securityConstraint;
+    }
+
+    private JwtTokenValve newJwtTokenValve() {
+        JwtTokenValve valve = new JwtTokenValve();
+        valve.setSecret("my-secret");
+        valve.setUpdateExpire(true);
+        return valve;
+    }
+    
+    private Realm newJdbcRealm() {
+        // your favourite realm 
+    }
+}
+```
+
+Some notes:
+* this is a programmatic version of `web.xml` configuration
+* `BasicAuthenticator` is required because `JwtTokenValve` **is not an authenticator**: 
+`BasicAuthenticator` mainly delegates login phase to registered Realm in *Tomcat Context*.
