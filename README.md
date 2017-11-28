@@ -88,7 +88,10 @@ You can use classes provided by *[java-jwt project](https://github.com/auth0/jav
 And use like this in your *login controller*:
 ```java
 JwtTokenBuilder tokenBuilder = JwtTokenBuilder.create("my super secret password");
-String token = tokenBuilder.userId(securityContext.getUserPrincipal().getName()).roles(Arrays.asList("admin", "devop")).expirySecs(1800).build();
+String token = tokenBuilder.userId(securityContext.getUserPrincipal().getName())
+                            .roles(Arrays.asList("admin", "devop"))
+                            .expirySecs(1800)
+                            .build();
 
 ...
 
@@ -159,6 +162,6 @@ public class TomcatJwtSecurityConfig implements EmbeddedServletContainerCustomiz
 ```
 
 Some notes:
-* this is a programmatic version of `web.xml` configuration
+* this is a programmatic version of `web.xml` configuration (and `context.xml`)
 * `BasicAuthenticator` is required because `JwtTokenValve` **is not an authenticator**: 
 `BasicAuthenticator` mainly delegates login phase to registered Realm in *Tomcat Context*.
