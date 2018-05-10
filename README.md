@@ -72,8 +72,11 @@ Please note `<auth-method>` tag: is set to **BASIC** in order to *avoid HTTP Ses
 Now your server is ready. How to generate a token from your app?
 
 # How to integrate in your project
-`JwtTokenValve` is supposed to search for authentication token in `X-Auth` *header param* or `auth` *query parameter* (useful for downloading a file for example)
-Your login controller **must** create a token in order to be validated from this *valve*: *each following request* must contains `X-Auth` header with token value.
+`JwtTokenValve` is supposed to search for authentication token according to these priorities:
+ * in `X-Auth` *header param* 
+ * in `Authorization` *header param* with token preceded by `Bearer ` type 
+ * in `access_token` *query parameter* (useful for downloading a file for example)
+Your login controller **must** create a token in order to be validated from this *valve*: *each following request* must contain `X-Auth` header with token value (or `Authorization: Bearer <token>` header or `access_token=<token>` query parameter).
 
 You can use classes provided by *[java-jwt project](https://github.com/auth0/java-jwt)* or our utility classes such as `JwtTokenBuilder` or `JwtConstants`: this is why *tomcat-jwt-security* is also available on Maven Central. You can include it in your project as **provided** dependency (because is in your TOMCAT_HOME/lib folder already!):
 ```xml
