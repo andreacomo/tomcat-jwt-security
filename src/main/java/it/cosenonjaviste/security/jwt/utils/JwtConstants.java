@@ -16,7 +16,7 @@ public class JwtConstants {
 	/**
 	 * Authentication header
 	 */
-	public static final String AUTH_PARAM = "auth";
+	public static final String AUTH_PARAM = "access_token";
 
 	/**
 	 * User Id claim key

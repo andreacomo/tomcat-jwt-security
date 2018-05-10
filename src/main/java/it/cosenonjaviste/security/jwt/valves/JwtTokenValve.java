@@ -5,18 +5,17 @@ import it.cosenonjaviste.security.jwt.model.AuthErrorResponse;
 import it.cosenonjaviste.security.jwt.utils.JwtConstants;
 import it.cosenonjaviste.security.jwt.utils.JwtTokenBuilder;
 import it.cosenonjaviste.security.jwt.utils.JwtTokenVerifier;
-
-import java.io.IOException;
-import java.nio.file.attribute.UserPrincipal;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.nio.file.attribute.UserPrincipal;
+import java.util.regex.Pattern;
 
 /**
  * Perform a JWT authentication on requester resource.
@@ -39,7 +38,7 @@ public class JwtTokenValve extends ValveBase {
 	private String secret;
 	
 	private boolean updateExpire;
-	
+
 	@Override
 	public void invoke(Request request, Response response) throws IOException,
 			ServletException {
@@ -85,9 +84,31 @@ public class JwtTokenValve extends ValveBase {
 		}
 	}
 
+	/**
+	 * Look for authentication token with following priorities
+	 * <ul>
+	 *     <li>in request header <em>X-Auth</em></li>
+	 *     <li>in request header <em>Authorization</em> (value preceded by <em>Bearer</em>)</li>
+	 *     <li>in request query parameter <em>access_token</em></li>
+	 * </ul>
+	 *
+	 * @param request
+	 * @return token or null
+	 */
 	private String getToken(Request request) {
-		String tokenFromHeader = request.getHeader(JwtConstants.AUTH_HEADER);
-		return tokenFromHeader != null ? tokenFromHeader : request.getParameter(JwtConstants.AUTH_PARAM);
+		String xAuthToken = request.getHeader(JwtConstants.AUTH_HEADER);
+		if (xAuthToken == null) {
+			String bearerToken = request.getHeader("Authorization");
+			if (bearerToken != null && bearerToken.toLowerCase().startsWith("bearer ")) {
+				return bearerToken.replaceAll("Bearer (.*)", "$1");
+			} else if (request.getParameter(JwtConstants.AUTH_PARAM) != null) {
+				return request.getParameter(JwtConstants.AUTH_PARAM);
+			} else {
+				return null;
+			}
+		} else {
+			return xAuthToken;
+		}
 	}
 
 	private void updateToken(JwtTokenVerifier tokenVerifier, Response response) {

@@ -96,6 +96,27 @@ public class JwtTokenValveTest {
 	 * @throws Exception
 	 */
 	@Test
+	public void shouldPassAuthInStandardHeader() throws Exception {
+		SecurityConstraint securityConstraint = new SecurityConstraint();
+		securityConstraint.setAuthConstraint(true);
+		when(realm.findSecurityConstraints(request, request.getContext()))
+				.thenReturn(new SecurityConstraint[] { securityConstraint });
+		when(request.getHeader("Authorization")).thenReturn(
+				"Bearer " + getTestToken());
+
+		jwtValve.invoke(request, response);
+
+		InOrder inOrder = inOrder(request, nextValve);
+		inOrder.verify(request).getHeader("Authorization");
+		inOrder.verify(request).setUserPrincipal(any(UserPrincipal.class));
+		inOrder.verify(request).setAuthType("TOKEN");
+		inOrder.verify(nextValve).invoke(request, response);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	@Test
 	public void shouldPassAuthInRequestParam() throws Exception {
 		SecurityConstraint securityConstraint = new SecurityConstraint();
 		securityConstraint.setAuthConstraint(true);
@@ -107,7 +128,7 @@ public class JwtTokenValveTest {
 		jwtValve.invoke(request, response);
 
 		InOrder inOrder = inOrder(request, nextValve);
-		inOrder.verify(request).getParameter(JwtConstants.AUTH_PARAM);
+		inOrder.verify(request, times(2)).getParameter(JwtConstants.AUTH_PARAM);
 		inOrder.verify(request).setUserPrincipal(any(UserPrincipal.class));
 		inOrder.verify(request).setAuthType("TOKEN");
 		inOrder.verify(nextValve).invoke(request, response);
