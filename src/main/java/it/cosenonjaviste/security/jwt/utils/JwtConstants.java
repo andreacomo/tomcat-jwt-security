@@ -12,7 +12,12 @@ public class JwtConstants {
 	 * Authentication header
 	 */
 	public static final String AUTH_HEADER = "X-Auth";
-	
+
+	/**
+	 * Authentication header
+	 */
+	public static final String AUTH_PARAM = "auth";
+
 	/**
 	 * User Id claim key
 	 */

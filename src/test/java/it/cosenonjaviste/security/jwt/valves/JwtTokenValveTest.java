@@ -75,7 +75,7 @@ public class JwtTokenValveTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void shouldPassAuth() throws Exception {
+	public void shouldPassAuthInHeader() throws Exception {
 		SecurityConstraint securityConstraint = new SecurityConstraint();
 		securityConstraint.setAuthConstraint(true);
 		when(realm.findSecurityConstraints(request, request.getContext()))
@@ -96,6 +96,27 @@ public class JwtTokenValveTest {
 	 * @throws Exception
 	 */
 	@Test
+	public void shouldPassAuthInRequestParam() throws Exception {
+		SecurityConstraint securityConstraint = new SecurityConstraint();
+		securityConstraint.setAuthConstraint(true);
+		when(realm.findSecurityConstraints(request, request.getContext()))
+				.thenReturn(new SecurityConstraint[] { securityConstraint });
+		when(request.getParameter(JwtConstants.AUTH_PARAM)).thenReturn(
+				getTestToken());
+
+		jwtValve.invoke(request, response);
+
+		InOrder inOrder = inOrder(request, nextValve);
+		inOrder.verify(request).getParameter(JwtConstants.AUTH_PARAM);
+		inOrder.verify(request).setUserPrincipal(any(UserPrincipal.class));
+		inOrder.verify(request).setAuthType("TOKEN");
+		inOrder.verify(nextValve).invoke(request, response);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	@Test
 	public void shouldFailAuthBecauseOfTokenNotSet() throws Exception {
 		SecurityConstraint securityConstraint = new SecurityConstraint();
 		securityConstraint.setAuthConstraint(true);
@@ -105,6 +126,7 @@ public class JwtTokenValveTest {
 		jwtValve.invoke(request, response);
 
 		verify(request).getHeader(JwtConstants.AUTH_HEADER);
+		verify(request).getParameter(JwtConstants.AUTH_PARAM);
 		verify(response).sendError(401, "Please login first");
 	}
 

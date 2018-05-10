@@ -67,7 +67,7 @@ public class JwtTokenValve extends ValveBase {
 	private void handleAuthentication(Request request, Response response)
 			throws IOException, ServletException {
 
-		String token = request.getHeader(JwtConstants.AUTH_HEADER);
+		String token = getToken(request);
 		if (token != null) {
 			JwtTokenVerifier tokenVerifier = JwtTokenVerifier.create(secret);
 			if (tokenVerifier.verify(token)) {
@@ -83,6 +83,11 @@ public class JwtTokenValve extends ValveBase {
 		} else {
 			sendUnauthorizedError(request, response, "Please login first");
 		}
+	}
+
+	private String getToken(Request request) {
+		String tokenFromHeader = request.getHeader(JwtConstants.AUTH_HEADER);
+		return tokenFromHeader != null ? tokenFromHeader : request.getParameter(JwtConstants.AUTH_PARAM);
 	}
 
 	private void updateToken(JwtTokenVerifier tokenVerifier, Response response) {
