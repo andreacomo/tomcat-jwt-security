@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/andreacomo/tomcat-jwt-security.svg?branch=master)](https://travis-ci.org/andreacomo/tomcat-jwt-security)
+[![Released Version](https://img.shields.io/maven-central/v/it.cosenonjaviste/tomcat-jwt-security.svg)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22it.cosenonjaviste%22%20a%3A%22tomcat-jwt-security%22)
 
 # tomcat-jwt-security
 This project aims to bring JWT token authentication capabilities into **Tomcat 8**, implementing an authentication filter as a Tomcat valve, based on [java-jwt](https://github.com/auth0/java-jwt) project.
