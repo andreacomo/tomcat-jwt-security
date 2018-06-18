@@ -31,12 +31,12 @@ public abstract class ResponseWriter {
 	 * @return
 	 */
 	public static ResponseWriter get(String mimeType) {
-		switch (mimeType != null ? mimeType : "") {
-		case APPLICATION_JSON:
+		String nullSafeMimeType = mimeType != null ? mimeType : "";
+		if (nullSafeMimeType.contains(APPLICATION_JSON)) {
 			return new JsonResponseWriter();
-		case APPLICATION_XML:
+		} else if (nullSafeMimeType.contains(APPLICATION_XML)) {
 			return new XmlResponseWriter();
-		default:
+		} else {
 			return new HtmlResponseWriter();
 		}
 	}
