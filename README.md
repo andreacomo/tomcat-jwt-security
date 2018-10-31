@@ -35,12 +35,14 @@ Now register **`JwtTokenValve`** in Tomcat configuration file.
 ```xml
 <Valve className="it.cosenonjaviste.security.jwt.valves.JwtTokenValve" 
 	  		 secret="my super secret password"
-	  		 updateExpire="true" />
+	  		 updateExpire="true"
+	  		 cookieName="cookie name containing token" />
 ```
 
 where:
 * ***secret***: is secret passphrase for signing token
 * ***updateExpire***: (default **false**) ***resends*** token to client on each response with expire time updated to last request
+* ***cookieName***: (optional) is the name of the cookie containing the token  
 
 In order for the valve to work, a **realm shoul be provided**. An example for a JDBCRealm can be found on [a post on TheJavaGeek](http://www.thejavageek.com/2013/07/07/configure-jdbcrealm-jaas-for-mysql-and-tomcat-7-with-form-based-authentication/)
 
@@ -77,7 +79,8 @@ Now your server is ready. How to generate a token from your app?
  * in `X-Auth` *header param* 
  * in `Authorization` *header param* with token preceded by `Bearer ` type 
  * in `access_token` *query parameter* (useful for downloading a file for example)
-Your login controller **must** create a token in order to be validated from this *valve*: *each following request* must contain `X-Auth` header with token value (or `Authorization: Bearer <token>` header or `access_token=<token>` query parameter).
+ * in a cookie. The cookie's name is done by valve parameter *cookieName*
+Your login controller **must** create a token in order to be validated from this *valve*: *each following request* must contain `X-Auth` header with token value (or `Authorization: Bearer <token>` header or `access_token=<token>` query parameter or cookie ).
 
 You can use classes provided by *[java-jwt project](https://github.com/auth0/java-jwt)* or our utility classes such as `JwtTokenBuilder` or `JwtConstants`: this is why *tomcat-jwt-security* is also available on Maven Central. You can include it in your project as **provided** dependency (because is in your TOMCAT_HOME/lib folder already!):
 ```xml

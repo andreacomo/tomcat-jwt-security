@@ -12,6 +12,7 @@ import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.file.attribute.UserPrincipal;
@@ -38,6 +39,10 @@ public class JwtTokenValve extends ValveBase {
 	private String secret;
 	
 	private boolean updateExpire;
+	
+	private String cookieName;
+
+	
 
 	@Override
 	public void invoke(Request request, Response response) throws IOException,
@@ -83,6 +88,24 @@ public class JwtTokenValve extends ValveBase {
 			sendUnauthorizedError(request, response, "Please login first");
 		}
 	}
+	
+	private String getCookieValueByName(Request request, String name){
+		if (name == null) return null;
+		Cookie cookieToken = null;
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null) {
+			for (int i = 0; i < cookies.length; i++) {
+		        Cookie cookie = cookies[i];
+		        if (cookie.getName().equals(name)){
+		        	cookieToken = cookie;
+	              }
+		      }
+		}
+		if (cookieToken != null){
+			return cookieToken.getValue();
+		}
+	    return null;
+	}
 
 	/**
 	 * Look for authentication token with following priorities
@@ -104,7 +127,12 @@ public class JwtTokenValve extends ValveBase {
 			} else if (request.getParameter(JwtConstants.AUTH_PARAM) != null) {
 				return request.getParameter(JwtConstants.AUTH_PARAM);
 			} else {
-				return null;
+				String cookieToken = getCookieValueByName(request, cookieName);
+				if (cookieToken == null){
+					return null;
+				} else {
+					return cookieToken;
+				}
 			}
 		} else {
 			return xAuthToken;
@@ -135,5 +163,13 @@ public class JwtTokenValve extends ValveBase {
 	 */
 	public void setUpdateExpire(boolean updateExpire) {
 		this.updateExpire = updateExpire;
+	}
+	
+	public String getCookieName() {
+		return cookieName;
+	}
+
+	public void setCookieName(String cookieName) {
+		this.cookieName = cookieName;
 	}
 }
