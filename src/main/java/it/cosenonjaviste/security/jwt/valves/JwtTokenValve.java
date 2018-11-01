@@ -16,7 +16,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.file.attribute.UserPrincipal;
-import java.util.regex.Pattern;
 
 /**
  * Perform a JWT authentication on requester resource.
@@ -42,8 +41,6 @@ public class JwtTokenValve extends ValveBase {
 	
 	private String cookieName;
 
-	
-
 	@Override
 	public void invoke(Request request, Response response) throws IOException,
 			ServletException {
@@ -52,7 +49,7 @@ public class JwtTokenValve extends ValveBase {
 				.findSecurityConstraints(request, request.getContext());
 
 		if ((constraints == null && !request.getContext().getPreemptiveAuthentication())
-				|| !hasAuthContraint(constraints)) {
+				|| !hasAuthConstraint(constraints)) {
 			this.getNext().invoke(request, response); 
 		} else {
 			handleAuthentication(request, response);
@@ -60,12 +57,17 @@ public class JwtTokenValve extends ValveBase {
 
 	}
 
-	private boolean hasAuthContraint(SecurityConstraint[] constraints) {
-		boolean authConstraint = true;
-		for (SecurityConstraint securityConstraint : constraints) {
-			authConstraint &= securityConstraint.getAuthConstraint();
+	private boolean hasAuthConstraint(SecurityConstraint[] constraints) {
+		if (constraints != null) {
+			boolean authConstraint = true;
+			for (SecurityConstraint securityConstraint : constraints) {
+				authConstraint &= securityConstraint.getAuthConstraint();
+			}
+			return authConstraint;
+		} else {
+			return false;
 		}
-		return authConstraint;
+
 	}
 
 	private void handleAuthentication(Request request, Response response)
@@ -90,19 +92,17 @@ public class JwtTokenValve extends ValveBase {
 	}
 	
 	private String getCookieValueByName(Request request, String name){
-		if (name == null) return null;
-		Cookie cookieToken = null;
+		if (name == null) {
+			return null;
+		}
+
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
-			for (int i = 0; i < cookies.length; i++) {
-		        Cookie cookie = cookies[i];
-		        if (cookie.getName().equals(name)){
-		        	cookieToken = cookie;
-	              }
-		      }
-		}
-		if (cookieToken != null){
-			return cookieToken.getValue();
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equalsIgnoreCase(name)) {
+					return cookie.getValue();
+				}
+			}
 		}
 	    return null;
 	}
@@ -123,16 +123,11 @@ public class JwtTokenValve extends ValveBase {
 		if (xAuthToken == null) {
 			String bearerToken = request.getHeader("Authorization");
 			if (bearerToken != null && bearerToken.toLowerCase().startsWith("bearer ")) {
-				return bearerToken.replaceAll("Bearer (.*)", "$1");
+				return bearerToken.replaceAll("(?i)Bearer (.*)", "$1");
 			} else if (request.getParameter(JwtConstants.AUTH_PARAM) != null) {
 				return request.getParameter(JwtConstants.AUTH_PARAM);
 			} else {
-				String cookieToken = getCookieValueByName(request, cookieName);
-				if (cookieToken == null){
-					return null;
-				} else {
-					return cookieToken;
-				}
+				return getCookieValueByName(request, cookieName);
 			}
 		} else {
 			return xAuthToken;
