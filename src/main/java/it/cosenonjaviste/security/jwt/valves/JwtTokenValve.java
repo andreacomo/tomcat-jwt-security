@@ -113,6 +113,7 @@ public class JwtTokenValve extends ValveBase {
 	 *     <li>in request header <em>X-Auth</em></li>
 	 *     <li>in request header <em>Authorization</em> (value preceded by <em>Bearer</em>)</li>
 	 *     <li>in request query parameter <em>access_token</em></li>
+	 *     <li>in a cookie configured by property <em>cookieName</em></li>
 	 * </ul>
 	 *
 	 * @param request
@@ -158,10 +159,6 @@ public class JwtTokenValve extends ValveBase {
 	 */
 	public void setUpdateExpire(boolean updateExpire) {
 		this.updateExpire = updateExpire;
-	}
-	
-	public String getCookieName() {
-		return cookieName;
 	}
 
 	public void setCookieName(String cookieName) {

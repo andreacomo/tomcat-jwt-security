@@ -22,6 +22,8 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import javax.servlet.http.Cookie;
+
 @RunWith(MockitoJUnitRunner.class)
 public class JwtTokenValveTest {
 
@@ -159,6 +161,33 @@ public class JwtTokenValveTest {
 	 * @throws Exception
 	 */
 	@Test
+	public void shouldPassAuthInCookie() throws Exception {
+		try {
+			String cookieName = "auth_token";
+			jwtValve.setCookieName(cookieName);
+			SecurityConstraint securityConstraint = new SecurityConstraint();
+			securityConstraint.setAuthConstraint(true);
+			when(realm.findSecurityConstraints(request, request.getContext()))
+					.thenReturn(new SecurityConstraint[]{securityConstraint});
+			when(request.getCookies()).thenReturn(newCookies(cookieName));
+
+			jwtValve.invoke(request, response);
+
+			InOrder inOrder = inOrder(request, nextValve);
+			inOrder.verify(request).getParameter(JwtConstants.AUTH_PARAM);
+			inOrder.verify(request).setUserPrincipal(any(UserPrincipal.class));
+			inOrder.verify(request).setAuthType("TOKEN");
+			inOrder.verify(nextValve).invoke(request, response);
+		} finally {
+			jwtValve.setCookieName(null);
+		}
+	}
+
+
+	/**
+	 * @throws Exception
+	 */
+	@Test
 	public void shouldFailAuthBecauseOfTokenNotSet() throws Exception {
 		SecurityConstraint securityConstraint = new SecurityConstraint();
 		securityConstraint.setAuthConstraint(true);
@@ -182,13 +211,13 @@ public class JwtTokenValveTest {
 		when(realm.findSecurityConstraints(request, request.getContext()))
 				.thenReturn(new SecurityConstraint[] { securityConstraint });
 		when(request.getHeader(JwtConstants.AUTH_HEADER)).thenReturn("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE0NDE1OTI3ODEsInVzZXJJZCI6InRlc3QiLCJyb2xlcyI6WyJyb2xlMSwgcm9sZTIiXX0.ObRZMakmlfdw75VCA8FuyFBpNOSu-x3wea9-_NpYJ9");
-		
+
 		jwtValve.invoke(request, response);
 
 		verify(request).getHeader(JwtConstants.AUTH_HEADER);
 		verify(response).sendError(401, "Token not valid. Please login first");
 	}
-	
+
 	/**
 	 * @throws Exception
 	 */
@@ -200,7 +229,7 @@ public class JwtTokenValveTest {
 				.thenReturn(new SecurityConstraint[] { securityConstraint });
 		when(request.getHeader(JwtConstants.AUTH_HEADER)).thenReturn(
 				getTestToken());
-		
+
 		jwtValve.setUpdateExpire(true);
 		jwtValve.invoke(request, response);
 
@@ -212,4 +241,7 @@ public class JwtTokenValveTest {
 				.roles(Arrays.asList("role1, role2")).expirySecs(10000).build();
 	}
 
+	private Cookie[] newCookies(String cookieName) {
+		return new Cookie[] {new Cookie(cookieName, getTestToken())};
+	}
 }
