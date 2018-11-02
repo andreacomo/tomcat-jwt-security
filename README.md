@@ -15,8 +15,8 @@ Finally, read how to create tokens in your app.
 
 ## 1.a Download artifacts
 Download artifacts (project and dependencies) from Maven Central Repo
-* [tomcat-jwt-security-2.1.0.jar](https://repo1.maven.org/maven2/it/cosenonjaviste/tomcat-jwt-security/2.1.0/tomcat-jwt-security-2.1.0.jar)
-* [java-jwt-2.1.0.jar](https://repo1.maven.org/maven2/com/auth0/java-jwt/2.1.0/java-jwt-2.1.0.jar)
+* [tomcat-jwt-security-2.2.0.jar](https://repo1.maven.org/maven2/it/cosenonjaviste/tomcat-jwt-security/2.2.0/tomcat-jwt-security-2.2.0.jar)
+* [java-jwt-2.3.0.jar](https://repo1.maven.org/maven2/com/auth0/java-jwt/2.3.0/java-jwt-2.3.0.jar)
 
 and place into *TOMCAT_HOME/lib* directory
 
@@ -87,7 +87,7 @@ You can use classes provided by *[java-jwt project](https://github.com/auth0/jav
 <dependency>
 	<groupId>it.cosenonjaviste</groupId>
 	<artifactId>tomcat-jwt-security</artifactId>
-	<version>2.1.0</version>
+	<version>2.2.0</version>
 	<scope>provided</scope>
 </dependency>
 ```
