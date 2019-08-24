@@ -1,12 +1,17 @@
 package it.cosenonjaviste.security.jwt.utils;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTCreator;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.Claim;
+import com.auth0.jwt.interfaces.DecodedJWT;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.auth0.jwt.Algorithm;
-import com.auth0.jwt.JWTSigner;
-import com.auth0.jwt.JWTSigner.Options;
+import static com.auth0.jwt.impl.PublicClaims.*;
+
 
 /**
  * Builder class for simplifying JWT token creation.
@@ -17,21 +22,16 @@ import com.auth0.jwt.JWTSigner.Options;
  *
  */
 public class JwtTokenBuilder {
-	
-	private static final String NOT_BEFORE = "nbf";
 
-	private static final String JWT_ID = "jti";
 
-	private static final String EXPIRE = "exp";
+	private JWTCreator.Builder jwtBuilder = JWT.create();
 
-	private static final String ISSUED_AT = "iat";
+	private ClaimsAdapter claims = new ClaimsAdapter(jwtBuilder);
 
-	private JWTSigner signer;
-	
-	private Map<String, Object> claims = new HashMap<>();
+	private OptionsAdapter optionsAdapter = new OptionsAdapter(jwtBuilder);
 
-	private Options options = new Options();
-	
+	private Algorithm algorithm;
+
 	private JwtTokenBuilder() {
 		
 	}
@@ -45,9 +45,9 @@ public class JwtTokenBuilder {
 	 */
 	public static JwtTokenBuilder create(String secret) {
 		JwtTokenBuilder builder = new JwtTokenBuilder();
-		builder.signer = new JWTSigner(secret); 
-		builder.options.setIssuedAt(true);
-		
+		builder.algorithm = Algorithm.HMAC256(secret);
+		builder.optionsAdapter.setIssuedAt(true);
+
 		return builder;
 	}
 	
@@ -101,8 +101,8 @@ public class JwtTokenBuilder {
 	 */
 	public static JwtTokenBuilder from(JwtTokenVerifier verifier, String secret) {
 		JwtTokenBuilder builder = create(secret);
-		Map<String, Object> verifiedClaims = verifier.getClaims();
-		restoreInternalStatus(builder, verifiedClaims);
+		DecodedJWT decodedJWT = verifier.getDecodedJWT();
+		restoreInternalStatus(builder, decodedJWT);
 		return builder;
 	}
 
@@ -134,20 +134,21 @@ public class JwtTokenBuilder {
 		return from(verifier, secret);
 	}
 	
-	private static void restoreInternalStatus(JwtTokenBuilder builder, Map<String, Object> verifiedClaims) {
+	private static void restoreInternalStatus(JwtTokenBuilder builder, DecodedJWT decodedJWT) {
+		Map<String, Claim> verifiedClaims = new HashMap<>(decodedJWT.getClaims());
 		if (verifiedClaims.containsKey(ISSUED_AT)) {
-			int issuedAt = (int) verifiedClaims.remove(ISSUED_AT);
-			if (verifiedClaims.containsKey(EXPIRE)) {
-				int expire = (int) verifiedClaims.remove(EXPIRE) - issuedAt;
-				builder.options.setExpirySeconds(expire);
+			int issuedAt = verifiedClaims.remove(ISSUED_AT).asInt();
+			if (verifiedClaims.containsKey(EXPIRES_AT)) {
+				int expire = verifiedClaims.remove(EXPIRES_AT).asInt() - issuedAt;
+				builder.optionsAdapter.setExpirySeconds(expire);
 			}
 			if (verifiedClaims.containsKey(NOT_BEFORE)) {
-				int notBefore = issuedAt - (int) verifiedClaims.remove(NOT_BEFORE);
-				builder.options.setNotValidBeforeLeeway(notBefore);
+				int notBefore = issuedAt - verifiedClaims.remove(NOT_BEFORE).asInt();
+				builder.optionsAdapter.setNotValidBeforeLeeway(notBefore);
 			}
 			if (verifiedClaims.containsKey(JWT_ID)) {
 				verifiedClaims.remove(JWT_ID);
-				builder.options.setJwtId(true);
+				builder.optionsAdapter.setJwtId(true);
 			}
 			builder.claims.putAll(verifiedClaims);
 		} else {
@@ -163,7 +164,9 @@ public class JwtTokenBuilder {
 	 * @return {@link JwtTokenBuilder}
 	 */
 	public JwtTokenBuilder userId(String name) {
-		return claimEntry(JwtConstants.USER_ID, name);
+		claims.put(JwtConstants.USER_ID, name);
+
+		return this;
 	}
 	
 	/**
@@ -174,7 +177,9 @@ public class JwtTokenBuilder {
 	 * @return {@link JwtTokenBuilder}
 	 */
 	public JwtTokenBuilder roles(Collection<String> roles) {
-		return claimEntry(JwtConstants.ROLES, roles);
+		claims.put(JwtConstants.ROLES, roles.toArray(new String[]{}));
+
+		return this;
 	}
 	
 	/**
@@ -198,7 +203,7 @@ public class JwtTokenBuilder {
 	 * @return {@link JwtTokenBuilder}
 	 */
 	public JwtTokenBuilder expirySecs(int seconds) {
-		options.setExpirySeconds(seconds);
+		optionsAdapter.setExpirySeconds(seconds);
 		return this;
 	}
 	
@@ -210,7 +215,7 @@ public class JwtTokenBuilder {
 	 * @return {@link JwtTokenBuilder}
 	 */
 	public JwtTokenBuilder algorithm(Algorithm algorithm) {
-		options.setAlgorithm(algorithm);
+		this.algorithm = algorithm;
 		return this;
 	}
 	
@@ -223,7 +228,7 @@ public class JwtTokenBuilder {
 	 * @return {@link JwtTokenBuilder}
 	 */
 	public JwtTokenBuilder issuedEntry(boolean issuedAt) {
-		options.setIssuedAt(issuedAt);
+		optionsAdapter.setIssuedAt(issuedAt);
 		return this;
 	}
 	
@@ -236,7 +241,7 @@ public class JwtTokenBuilder {
 	 * @return {@link JwtTokenBuilder}
 	 */
 	public JwtTokenBuilder generateJwtId(boolean jwtId) {
-		options.setJwtId(jwtId);
+		optionsAdapter.setJwtId(jwtId);
 		return this;
 	}
 	
@@ -248,7 +253,7 @@ public class JwtTokenBuilder {
 	 * @return {@link JwtTokenBuilder}
 	 */
 	public JwtTokenBuilder notValidBeforeLeeway(int notValidBeforeLeeway) {
-		options.setNotValidBeforeLeeway(notValidBeforeLeeway);
+		optionsAdapter.setNotValidBeforeLeeway(notValidBeforeLeeway);
 		return this;
 	}
 	
@@ -260,10 +265,7 @@ public class JwtTokenBuilder {
 	 * @throws IllegalStateException if <tt>userId</tt> and <tt>roles</tt> are not provided
 	 */
 	public String build() {
-		if (claims.containsKey(JwtConstants.USER_ID) && claims.containsKey(JwtConstants.ROLES)) {
-			return signer.sign(claims, options);			
-		} else {
-			throw new IllegalStateException("userId and roles claims must be added!");
-		}
+		Preconditions.checkState(claims.containsKey(JwtConstants.USER_ID) && claims.containsKey(JwtConstants.ROLES), "userId and roles claims must be added!");
+		return jwtBuilder.sign(algorithm);
 	}
 }

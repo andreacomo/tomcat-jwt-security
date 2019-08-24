@@ -1,17 +1,14 @@
 package it.cosenonjaviste.security.jwt.utils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.auth0.jwt.JWTSigner;
+import java.util.Arrays;
+
+import static org.junit.Assert.*;
 
 public class JwtTokenVerifierTest {
 
@@ -20,20 +17,46 @@ public class JwtTokenVerifierTest {
 	
 	@BeforeClass
 	public static void before() {
-		Map<String, Object> claims = new HashMap<String, Object>();
-		claims.put(JwtConstants.USER_ID, "foo");
-		claims.put(JwtConstants.ROLES, Arrays.asList("role1", "role2"));
-		
-		JWTSigner signer = new JWTSigner(SECRET);
-		token = signer.sign(claims);
+		token = JWT.create()
+				.withClaim(JwtConstants.USER_ID, "foo")
+				.withArrayClaim(JwtConstants.ROLES, new String[] {"role1", "role2"})
+				.sign(Algorithm.HMAC256(SECRET));
 	}
 	
 	@Test
 	public void testVerify() {
 		JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
 		assertTrue(verifier.verify(token));
+
+		assertFalse(verifier.verify("not_a_token"));
 	}
-	
+
+	@Test
+	public void testVerifyCreatingWithCustomAlgorithm() {
+		Algorithm algorithm = Algorithm.HMAC512(SECRET);
+		JwtTokenVerifier verifier = JwtTokenVerifier.create(algorithm);
+		assertFalse(verifier.verify(token));
+
+		String newToken = JWT.create()
+				.withClaim(JwtConstants.USER_ID, "foo")
+				.withArrayClaim(JwtConstants.ROLES, new String[]{"role1", "role2"})
+				.sign(algorithm);
+		assertTrue(verifier.verify(newToken));
+	}
+
+	@Test
+	public void testVerifyOrThrow() {
+		JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
+		verifier.verifyOrThrow(token);
+
+		try {
+			verifier.verifyOrThrow("not_a_token");
+			fail("should not be here!");
+		} catch (Exception e) {
+			assertTrue(e instanceof JWTVerificationException);
+		}
+	}
+
 	@Test
 	public void testGetUserId() {
 		JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
@@ -54,10 +77,17 @@ public class JwtTokenVerifierTest {
 	}
 	
 	@Test(expected = IllegalStateException.class)
-	public void shouldThrowIllegalStateException() throws Exception {
+	public void shouldThrowIllegalStateExceptionWhenGetUserId() {
 		JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
 		
 		assertNotNull(verifier.getUserId());
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void shouldThrowIllegalStateExceptionWhenGetRoles() {
+		JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
+
+		assertNotNull(verifier.getRoles());
 	}
 
 }

@@ -7,121 +7,134 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import org.junit.Test;
 
 import com.auth0.jwt.JWTVerifier;
 
 public class JwtTokenBuilderTest {
 
-	private static final String SECRET = "my secret";
-	
-	@Test
-	public void shouldContains5Claims() throws Exception {
-		String token = createToken();
-		
-		assertNotNull(token);
-		
-		JWTVerifier verifier = new JWTVerifier(SECRET);
-		Map<String, Object> tokenObject = verifier.verify(token);
-		
-		assertNotNull(tokenObject);
-		assertEquals(5, tokenObject.size());
-		assertEquals(tokenObject.get(JwtConstants.USER_ID), "test");
-		assertEquals(tokenObject.get(JwtConstants.ROLES), Arrays.asList("role1, role2"));
-		
-		long now = System.currentTimeMillis() / 1000L;
-		long timeToExpire = ((int)tokenObject.get("exp")) - now;
-		assertTrue(timeToExpire > 0);
-		assertTrue(timeToExpire <= 10000);
-		
-		int issueTime = (int) tokenObject.get("iat");
-		assertTrue(issueTime <= now);
-	}
+    private static final String SECRET = "my secret";
 
-	@Test(expected=IllegalStateException.class)
-	public void shouldBeEmptyAndInvalid() throws Exception {
-		JwtTokenBuilder.create(SECRET).build();
-	}
-	
-	@Test
-	public void shouldParseJwtFromString() throws Exception {
-		String token = createToken();
-		
-		assertNotNull(token);
-		
-		JwtTokenBuilder from = JwtTokenBuilder.from(token, SECRET);
-		String token2 = from.expirySecs(20000).notValidBeforeLeeway(10000).build();
-		
-		int now = (int) (System.currentTimeMillis() / 1000L);
-		JWTVerifier verifier = new JWTVerifier(SECRET);
-		Map<String, Object> tokenObject = verifier.verify(token2);
+    @Test
+    public void shouldContains5Claims() throws Exception {
+        String token = createToken();
 
-		int exp = (int) tokenObject.get("exp");
-		assertTrue(exp <= now + 20000);
-		assertTrue(exp > now);
+        assertNotNull(token);
 
-		int nbf = (int) tokenObject.get("nbf");
-		assertTrue(nbf >= now - 10000);
-		assertTrue(nbf < now);
-	}
+        JWTVerifier verifier = JWT.require(Algorithm.HMAC256(SECRET)).build();
+        DecodedJWT tokenObject = verifier.verify(token);
 
-	
-	@Test(expected = IllegalStateException.class)
-	public void shouldThrowIllegalStateException() throws Exception {
-		JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
-		JwtTokenBuilder.from(verifier, SECRET);
-	}
-	
-	@Test
-	public void shouldIncreaseExpireTime() throws Exception {
-		String token = createToken();
-		JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
-		int firstExpire = getExp(verifier, token);
-		
-		TimeUnit.SECONDS.sleep(2);
-		
-		token = JwtTokenBuilder.from(verifier, SECRET).build();
-		verifier = JwtTokenVerifier.create(SECRET);
-		int secondExpire = getExp(verifier, token);
-		
-		assertTrue(secondExpire >= firstExpire + 2);
-	}
+        assertNotNull(tokenObject);
+        assertEquals(5, tokenObject.getClaims().size());
+        assertEquals(tokenObject.getClaim(JwtConstants.USER_ID).asString(), "test");
+        assertEquals(tokenObject.getClaim(JwtConstants.ROLES).asList(String.class), Arrays.asList("role1", "role2"));
 
-	@Test
-	public void shouldRecalculateNotBeforeClaimCorrectly() {
-		String token = createToken();
+        long now = System.currentTimeMillis() / 1000L;
+        long timeToExpire = tokenObject.getClaim("exp").asInt() - now;
+        assertTrue(timeToExpire > 0);
+        assertTrue(timeToExpire <= 10000);
 
-		JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
-		verifier.verify(token);
-		Integer nbf = (Integer) verifier.getClaims().get("nbf");
-		Integer exp = getExp(verifier, token);
+        int issueTime = tokenObject.getClaim("iat").asInt();
+        assertTrue(issueTime <= now);
+    }
 
-		assertNotNull(nbf);
-		long nowInSecs = new Date().getTime() / 1000;
-		assertTrue(nowInSecs > nbf);
-		assertNotNull(exp);
-		assertTrue(nowInSecs < exp);
+    @Test(expected = IllegalStateException.class)
+    public void shouldBeEmptyAndInvalid() throws Exception {
+        JwtTokenBuilder.create(SECRET).build();
+    }
 
-		JwtTokenBuilder tokenBuilder = JwtTokenBuilder.from(verifier, SECRET);
-		String recreatedToken = tokenBuilder.build();
+    @Test
+    public void shouldParseJwtFromString() throws Exception {
+        String token = createToken();
 
-		verifier = JwtTokenVerifier.create(SECRET);
-		verifier.verify(recreatedToken);
-		Integer recreatedNbf = (Integer) verifier.getClaims().get("nbf");
-		Integer recreatedExp = getExp(verifier, token);
+        assertNotNull(token);
 
-		assertEquals(exp, recreatedExp);
-		assertEquals((float) nbf, (float) recreatedNbf, 1);
-	}
+        JwtTokenBuilder from = JwtTokenBuilder.from(token, SECRET);
+        String token2 = from.expirySecs(20000).notValidBeforeLeeway(10000).build();
 
-	private int getExp(JwtTokenVerifier verifier, String token) {
-		verifier.verify(token);
-		Map<String, Object> claims = verifier.getClaims();
-		return (int) claims.get("exp");
-	}
+        int now = (int) (System.currentTimeMillis() / 1000L);
+        JWTVerifier verifier = JWT.require(Algorithm.HMAC256(SECRET)).build();
+        DecodedJWT tokenObject = verifier.verify(token2);
 
-	private String createToken() {
-		JwtTokenBuilder builder = JwtTokenBuilder.create(SECRET);
-		return builder.userId("test").roles(Arrays.asList("role1, role2")).expirySecs(10000).notValidBeforeLeeway(5000).build();
-	}
+        int exp = tokenObject.getClaim("exp").asInt();
+        assertTrue(exp <= now + 20000);
+        assertTrue(exp > now);
+
+        int nbf = tokenObject.getClaim("nbf").asInt();
+        assertTrue(nbf >= now - 10000);
+        assertTrue(nbf < now);
+    }
+
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldThrowIllegalStateException() throws Exception {
+        JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
+        JwtTokenBuilder.from(verifier, SECRET);
+    }
+
+    @Test
+    public void shouldIncreaseExpireTime() throws Exception {
+        String token = createToken();
+        JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
+        int firstExpire = getExp(verifier, token);
+
+        TimeUnit.SECONDS.sleep(2);
+
+        token = JwtTokenBuilder.from(verifier, SECRET).build();
+        verifier = JwtTokenVerifier.create(SECRET);
+        int secondExpire = getExp(verifier, token);
+
+        assertTrue(secondExpire >= firstExpire + 2);
+
+        assertEquals("test", verifier.getUserId());
+        assertEquals(Arrays.asList("role1", "role2"), verifier.getRoles());
+    }
+
+    @Test
+    public void shouldRecalculateNotBeforeClaimCorrectly() {
+        String token = createToken();
+
+        JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
+        verifier.verify(token);
+        Integer nbf = verifier.getDecodedJWT().getClaim("nbf").asInt();
+        Integer exp = getExp(verifier, token);
+
+        assertNotNull(nbf);
+        long nowInSecs = new Date().getTime() / 1000;
+        assertTrue(nowInSecs > nbf);
+        assertNotNull(exp);
+        assertTrue(nowInSecs < exp);
+
+        JwtTokenBuilder tokenBuilder = JwtTokenBuilder.from(verifier, SECRET);
+        String recreatedToken = tokenBuilder.build();
+
+        verifier = JwtTokenVerifier.create(SECRET);
+        verifier.verify(recreatedToken);
+        Integer recreatedNbf = verifier.getDecodedJWT().getClaim("nbf").asInt();
+        Integer recreatedExp = getExp(verifier, token);
+
+        assertEquals(exp, recreatedExp);
+        assertEquals((float) nbf, (float) recreatedNbf, 1);
+
+        assertEquals("test", verifier.getUserId());
+        assertEquals(Arrays.asList("role1", "role2"), verifier.getRoles());
+    }
+
+    private int getExp(JwtTokenVerifier verifier, String token) {
+        verifier.verify(token);
+        DecodedJWT claims = verifier.getDecodedJWT();
+        return claims.getClaim("exp").asInt();
+    }
+
+    private String createToken() {
+        return JwtTokenBuilder.create(SECRET)
+                .userId("test")
+                .roles(Arrays.asList("role1", "role2"))
+                .expirySecs(10000)
+                .notValidBeforeLeeway(5000)
+                .build();
+    }
 }
