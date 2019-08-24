@@ -19,6 +19,7 @@ Download artifacts (project and dependencies) from Maven Central Repo
   * [java-jwt-3.8.2.jar](https://repo1.maven.org/maven2/com/auth0/java-jwt/3.8.2/java-jwt-3.8.2.jar)
     * [jackson-databind-2.9.9.3.jar](https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.9.9.3/jackson-databind-2.9.9.3.jar)
     * [commons-codec-1.12.jar](https://repo1.maven.org/maven2/commons-codec/commons-codec/1.12/commons-codec-1.12.jar)
+
 and place into *TOMCAT_HOME/lib* directory
 
 ## 1.b Build project
