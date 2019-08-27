@@ -37,20 +37,31 @@ public class JwtTokenBuilder {
 	}
 	
 	/**
-	 * Creates a new {@link JwtTokenBuilder} instance
+	 * Creates a new {@link JwtTokenBuilder} instance, using HMAC256 algorithm
 	 * 
 	 * @param secret secret phrase
 	 * 
 	 * @return a new {@link JwtTokenBuilder} instance
 	 */
 	public static JwtTokenBuilder create(String secret) {
+		return create(Algorithm.HMAC256(secret));
+	}
+
+	/**
+	 * Creates a new {@link JwtTokenBuilder} instance
+	 *
+	 * @param algorithm to use for encoding
+	 *
+	 * @return a new {@link JwtTokenBuilder} instance
+	 */
+	public static JwtTokenBuilder create(Algorithm algorithm) {
 		JwtTokenBuilder builder = new JwtTokenBuilder();
-		builder.algorithm = Algorithm.HMAC256(secret);
+		builder.algorithm = algorithm;
 		builder.optionsAdapter.setIssuedAt(true);
 
 		return builder;
 	}
-	
+
 	/**
 	 * Creates a {@link JwtTokenBuilder} instance from token and secret.
 	 * <br >
@@ -68,12 +79,16 @@ public class JwtTokenBuilder {
 	 * 
 	 * @param token
 	 * @param secret
+	 *
+	 * @deprecated see {@link #from(JwtTokenVerifier)}. This method can cause error because do not use algorithm from token to generate {@link JwtTokenBuilder}
+	 *
 	 * @return
 	 */
+	@Deprecated
 	public static JwtTokenBuilder from(String token, String secret) {
 		JwtTokenVerifier verifier = JwtTokenVerifier.create(secret);
 		verifier.verify(token);
-		return from(verifier, secret);
+		return from(verifier);
 	}
 
 	/**
@@ -96,11 +111,41 @@ public class JwtTokenBuilder {
 	 * @param verifier
 	 * @param secret
 	 * @return
-	 * 
+	 *
+	 * @deprecated see {@link #from(JwtTokenVerifier)}.
+	 * This method is not using <tt>secret</tt> parameter and takes every information from <tt>verifier</tt>
+	 *
 	 * @throws IllegalStateException if token is not verified by provided verifier
 	 */
+	@Deprecated
 	public static JwtTokenBuilder from(JwtTokenVerifier verifier, String secret) {
-		JwtTokenBuilder builder = create(secret);
+		return from(verifier);
+	}
+
+	/**
+	 * Creates a {@link JwtTokenBuilder} instance from token and secret.
+	 * <br >
+	 * Token <strong>must</strong> contains "<em>iat</em>" param in order to restore builder status
+	 * <br >
+	 * Use this method if you want to edit current token: if "<em>jti</em>" param is present, will be overwritten
+	 * <br >
+	 * Token <strong>must</strong> be verified before calling this method
+	 * <br >
+	 * <br >
+	 * Rebuilding this token has side effect:
+	 * <ul>
+	 * <li>if "<em>jti</em>" param is present, will be overwritten</li>
+	 * <li>if "<em>exp</em>" param is present, expire time will be recalculated starting from current timestamp</li>
+	 * <li>if "<em>nbf</em>" param is present, its value will be recalculated starting from current timestamp</li>
+	 * </ul>
+	 *
+	 * @param verifier
+	 * @return
+	 *
+	 * @throws IllegalStateException if token is not verified by provided verifier
+	 */
+	public static JwtTokenBuilder from(JwtTokenVerifier verifier) {
+		JwtTokenBuilder builder = create(verifier.getAlgorithm());
 		DecodedJWT decodedJWT = verifier.getDecodedJWT();
 		restoreInternalStatus(builder, decodedJWT);
 		return builder;
@@ -126,12 +171,15 @@ public class JwtTokenBuilder {
 	 * @param token
 	 * @param secret
 	 * @return
-	 * 
+	 *
+	 * @deprecated see {@link #from(JwtTokenVerifier)}. Secret is not used anymore
+	 *
 	 * @throws IllegalStateException if token is not verified by provided verifier
 	 */
+	@Deprecated
 	public static JwtTokenBuilder from(JwtTokenVerifier verifier, String token, String secret) {
 		verifier.verify(token);
-		return from(verifier, secret);
+		return from(verifier);
 	}
 	
 	private static void restoreInternalStatus(JwtTokenBuilder builder, DecodedJWT decodedJWT) {

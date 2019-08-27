@@ -30,22 +30,21 @@ public class JwtTokenVerifier {
 
 	private DecodedJWT decodedJWT;
 
+	private Algorithm algorithm;
+
 	private JwtTokenVerifier() {
 
 	}
 	
 	/**
-	 * Creates a new instance of {@link JwtTokenVerifier} class
+	 * Creates a new instance of {@link JwtTokenVerifier} class, using HMAC256 algorithm
 	 * 
 	 * @param secret secret phrase
 	 * 
 	 * @return a new instance of {@link JwtTokenVerifier} class
 	 */
 	public static JwtTokenVerifier create(String secret) {
-		JwtTokenVerifier tokenVerifier = new JwtTokenVerifier();
-		tokenVerifier.verifier = JWT.require(Algorithm.HMAC256(secret)).build();
-		
-		return tokenVerifier;
+		return create(Algorithm.HMAC256(secret));
 	}
 
 	/**
@@ -58,6 +57,7 @@ public class JwtTokenVerifier {
 	public static JwtTokenVerifier create(Algorithm algorithm) {
 		JwtTokenVerifier tokenVerifier = new JwtTokenVerifier();
 		tokenVerifier.verifier = JWT.require(algorithm).build();
+		tokenVerifier.algorithm = algorithm;
 
 		return tokenVerifier;
 	}
@@ -119,5 +119,9 @@ public class JwtTokenVerifier {
 	public DecodedJWT getDecodedJWT() {
 		Preconditions.checkState(this.decodedJWT != null, "Please call verify method first!");
 		return this.decodedJWT;
+	}
+
+	Algorithm getAlgorithm() {
+		return algorithm;
 	}
 }

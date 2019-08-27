@@ -123,6 +123,18 @@ public class JwtTokenBuilderTest {
         assertEquals(Arrays.asList("role1", "role2"), verifier.getRoles());
     }
 
+    @Test
+    public void shouldKeepAlgorithmFromVerifier() throws Exception {
+        Algorithm algorithm = Algorithm.HMAC512(SECRET);
+        String token = createToken(algorithm);
+        JwtTokenVerifier verifier = JwtTokenVerifier.create(algorithm);
+        verifier.verify(token);
+
+        token = JwtTokenBuilder.from(verifier, SECRET).build();
+
+        assertEquals("HS512", JWT.decode(token).getAlgorithm());
+    }
+
     private int getExp(JwtTokenVerifier verifier, String token) {
         verifier.verify(token);
         DecodedJWT claims = verifier.getDecodedJWT();
@@ -131,6 +143,15 @@ public class JwtTokenBuilderTest {
 
     private String createToken() {
         return JwtTokenBuilder.create(SECRET)
+                .userId("test")
+                .roles(Arrays.asList("role1", "role2"))
+                .expirySecs(10000)
+                .notValidBeforeLeeway(5000)
+                .build();
+    }
+
+    private String createToken(Algorithm algorithm) {
+        return JwtTokenBuilder.create(algorithm)
                 .userId("test")
                 .roles(Arrays.asList("role1", "role2"))
                 .expirySecs(10000)
