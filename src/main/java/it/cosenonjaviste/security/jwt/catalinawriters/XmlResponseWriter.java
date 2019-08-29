@@ -1,10 +1,9 @@
 package it.cosenonjaviste.security.jwt.catalinawriters;
 
-import java.io.IOException;
+import org.apache.catalina.connector.Response;
 
 import javax.xml.bind.JAXB;
-
-import org.apache.catalina.connector.Response;
+import java.io.IOException;
 
 /**
  * XML response writer, based on JAXB serializer

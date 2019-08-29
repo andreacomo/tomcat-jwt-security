@@ -2,7 +2,7 @@ package it.cosenonjaviste.security.jwt.catalinawriters;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by acomo on 18/06/18.

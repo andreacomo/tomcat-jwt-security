@@ -1,18 +1,16 @@
 package it.cosenonjaviste.security.jwt.utils;
 
-import static org.junit.Assert.*;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.junit.Test;
 
-import com.auth0.jwt.JWTVerifier;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.*;
 
 public class JwtTokenBuilderTest {
 

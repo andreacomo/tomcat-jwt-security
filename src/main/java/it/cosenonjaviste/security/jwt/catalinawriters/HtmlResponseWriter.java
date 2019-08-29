@@ -1,8 +1,8 @@
 package it.cosenonjaviste.security.jwt.catalinawriters;
 
-import java.io.IOException;
-
 import org.apache.catalina.connector.Response;
+
+import java.io.IOException;
 
 /**
  * Standard HTML response writer
