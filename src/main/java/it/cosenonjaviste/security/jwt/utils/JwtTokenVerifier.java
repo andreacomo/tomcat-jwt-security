@@ -121,6 +121,9 @@ public class JwtTokenVerifier {
 		return this.decodedJWT;
 	}
 
+	/**
+	 * @return used algorithm for encoding token
+	 */
 	Algorithm getAlgorithm() {
 		return algorithm;
 	}

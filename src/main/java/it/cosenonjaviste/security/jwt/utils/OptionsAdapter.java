@@ -6,6 +6,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * Internal Option class adapter to maintain signatures with previous version of java-jwt library
+ *
+ * @author acomo
+ */
 class OptionsAdapter {
 
     private final JWTCreator.Builder jwtBuilder;
