@@ -1,10 +1,9 @@
 package it.cosenonjaviste.security.jwt.catalinawriters;
 
-import java.io.IOException;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.catalina.connector.Response;
 
-import com.auth0.jwt.internal.com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 
 /**
  * JSON response writer, based on Jackson json serializer

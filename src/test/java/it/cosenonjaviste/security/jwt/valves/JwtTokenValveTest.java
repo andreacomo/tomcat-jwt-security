@@ -1,13 +1,7 @@
 package it.cosenonjaviste.security.jwt.valves;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
 import it.cosenonjaviste.security.jwt.utils.JwtConstants;
 import it.cosenonjaviste.security.jwt.utils.JwtTokenBuilder;
-
-import java.nio.file.attribute.UserPrincipal;
-import java.util.Arrays;
-
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Realm;
@@ -23,6 +17,11 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.servlet.http.Cookie;
+import java.nio.file.attribute.UserPrincipal;
+import java.util.Arrays;
+
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class JwtTokenValveTest {
@@ -238,7 +237,7 @@ public class JwtTokenValveTest {
 
 	private String getTestToken() {
 		return JwtTokenBuilder.create(SECRET).userId("test")
-				.roles(Arrays.asList("role1, role2")).expirySecs(10000).build();
+				.roles(Arrays.asList("role1", "role2")).expirySecs(10000).build();
 	}
 
 	private Cookie[] newCookies(String cookieName) {

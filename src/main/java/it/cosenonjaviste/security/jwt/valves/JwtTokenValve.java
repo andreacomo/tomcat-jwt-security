@@ -136,7 +136,7 @@ public class JwtTokenValve extends ValveBase {
 	}
 
 	private void updateToken(JwtTokenVerifier tokenVerifier, Response response) {
-		String newToken = JwtTokenBuilder.from(tokenVerifier, secret).build();
+		String newToken = JwtTokenBuilder.from(tokenVerifier).build();
 		response.setHeader(JwtConstants.AUTH_HEADER, newToken);
 	}
 

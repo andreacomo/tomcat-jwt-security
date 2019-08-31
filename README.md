@@ -15,8 +15,10 @@ Finally, read how to create tokens in your app.
 
 ## 1.a Download artifacts
 Download artifacts (project and dependencies) from Maven Central Repo
-* [tomcat-jwt-security-2.2.0.jar](https://repo1.maven.org/maven2/it/cosenonjaviste/tomcat-jwt-security/2.2.0/tomcat-jwt-security-2.2.0.jar)
-* [java-jwt-2.3.0.jar](https://repo1.maven.org/maven2/com/auth0/java-jwt/2.3.0/java-jwt-2.3.0.jar)
+* [tomcat-jwt-security-2.3.0.jar](https://repo1.maven.org/maven2/it/cosenonjaviste/tomcat-jwt-security/2.3.0/tomcat-jwt-security-2.3.0.jar)
+  * [java-jwt-3.8.2.jar](https://repo1.maven.org/maven2/com/auth0/java-jwt/3.8.2/java-jwt-3.8.2.jar)
+    * [jackson-databind-2.9.9.3.jar](https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.9.9.3/jackson-databind-2.9.9.3.jar)
+    * [commons-codec-1.12.jar](https://repo1.maven.org/maven2/commons-codec/commons-codec/1.12/commons-codec-1.12.jar)
 
 and place into *TOMCAT_HOME/lib* directory
 
@@ -79,7 +81,7 @@ Now your server is ready. How to generate a token from your app?
  * in `X-Auth` *header param* 
  * in `Authorization` *header param* with token preceded by `Bearer ` type 
  * in `access_token` *query parameter* (useful for downloading a file for example)
- * in a cookie. The cookie's name is done by valve parameter *cookieName*
+ * in a `cookie`. The cookie's name is done by valve parameter *cookieName*
 Your login controller **must** create a token in order to be validated from this *valve*: *each following request* must contain `X-Auth` header with token value (or `Authorization: Bearer <token>` header or `access_token=<token>` query parameter or cookie ).
 
 You can use classes provided by *[java-jwt project](https://github.com/auth0/java-jwt)* or our utility classes such as `JwtTokenBuilder` or `JwtConstants`: this is why *tomcat-jwt-security* is also available on Maven Central. You can include it in your project as **provided** dependency (because is in your TOMCAT_HOME/lib folder already!):

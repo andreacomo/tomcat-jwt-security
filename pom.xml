@@ -46,7 +46,9 @@
 		<to.deploy.dir>${project.build.directory}/to-deploy</to.deploy.dir>
 
 		<tomcat.version>8.0.28</tomcat.version>
-		<jwt.version>2.3.0</jwt.version>
+		<jwt.version>3.8.2</jwt.version>
+		<!-- Jackson version taken from JWT pom -->
+		<jackson.version>2.9.9.3</jackson.version>
 		<commons.codec.version>1.4</commons.codec.version>
 		<junit.version>4.12</junit.version>
 		<mockito.version>1.10.19</mockito.version>
@@ -69,6 +71,11 @@
 			<groupId>com.auth0</groupId>
 			<artifactId>java-jwt</artifactId>
 			<version>${jwt.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
