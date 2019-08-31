@@ -84,7 +84,6 @@ public class JwtTokenVerifier {
 	 *
 	 * @param token JWT token
 	 *
-	 * @return verification status
 	 * @throws JWTVerificationException if validation fails
 	 */
 	public void verifyOrThrow(String token) {

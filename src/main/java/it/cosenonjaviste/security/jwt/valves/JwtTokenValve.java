@@ -155,7 +155,7 @@ public class JwtTokenValve extends ValveBase {
 	/**
 	 * Updates expire time on each request
 	 * 
-	 * @param updateExpire
+	 * @param updateExpire true to enable token update on each request
 	 */
 	public void setUpdateExpire(boolean updateExpire) {
 		this.updateExpire = updateExpire;

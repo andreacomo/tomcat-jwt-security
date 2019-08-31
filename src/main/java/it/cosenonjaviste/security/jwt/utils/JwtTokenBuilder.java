@@ -77,12 +77,12 @@ public class JwtTokenBuilder {
 	 * <li>if "<em>nbf</em>" param is present, its value will be recalculated starting from current timestamp</li> 
 	 * </ul>
 	 * 
-	 * @param token
-	 * @param secret
+	 * @param token JWT token
+	 * @param secret used to sign JWT
 	 *
 	 * @deprecated see {@link #from(JwtTokenVerifier)}. This method can cause error because do not use algorithm from token to generate {@link JwtTokenBuilder}
 	 *
-	 * @return
+	 * @return a new {@link JwtTokenBuilder} instance
 	 */
 	@Deprecated
 	public static JwtTokenBuilder from(String token, String secret) {
@@ -108,9 +108,10 @@ public class JwtTokenBuilder {
 	 * <li>if "<em>nbf</em>" param is present, its value will be recalculated starting from current timestamp</li> 
 	 * </ul>
 	 * 
-	 * @param verifier
-	 * @param secret
-	 * @return
+	 * @param verifier a {@link JwtTokenVerifier} instance
+	 * @param secret used to sign JWT
+	 *
+	 * @return a new {@link JwtTokenBuilder} instance
 	 *
 	 * @deprecated see {@link #from(JwtTokenVerifier)}.
 	 * This method is not using <tt>secret</tt> parameter and takes every information from <tt>verifier</tt>
@@ -139,8 +140,9 @@ public class JwtTokenBuilder {
 	 * <li>if "<em>nbf</em>" param is present, its value will be recalculated starting from current timestamp</li>
 	 * </ul>
 	 *
-	 * @param verifier
-	 * @return
+	 * @param verifier a {@link JwtTokenVerifier} instance
+	 *
+	 * @return a new {@link JwtTokenBuilder} instance
 	 *
 	 * @throws IllegalStateException if token is not verified by provided verifier
 	 */
@@ -167,10 +169,11 @@ public class JwtTokenBuilder {
 	 * <li>if "<em>exp</em>" param is present, expire time will be recalculated starting from current timestamp</li> 
 	 * <li>if "<em>nbf</em>" param is present, its value will be recalculated starting from current timestamp</li> 
 	 * </ul>
-	 * @param verifier
-	 * @param token
-	 * @param secret
-	 * @return
+	 * @param verifier a {@link JwtTokenVerifier} instance
+	 * @param token JWT token
+	 * @param secret used to sign JWT
+	 *
+	 * @return a new {@link JwtTokenBuilder} instance
 	 *
 	 * @deprecated see {@link #from(JwtTokenVerifier)}. Secret is not used anymore
 	 *
@@ -220,7 +223,7 @@ public class JwtTokenBuilder {
 	/**
 	 * Add <tt>roles</tt> claim to JWT body
 	 * 
-	 * @param roles
+	 * @param roles roles to add
 	 * 
 	 * @return {@link JwtTokenBuilder}
 	 */
@@ -233,8 +236,8 @@ public class JwtTokenBuilder {
 	/**
 	 * Add a custom claim to JWT body
 	 * 
-	 * @param key
-	 * @param value
+	 * @param key key of new claim
+	 * @param value value of new claim
 	 * 
 	 * @return {@link JwtTokenBuilder}
 	 */
@@ -246,7 +249,7 @@ public class JwtTokenBuilder {
 	/**
 	 * Add JWT claim <tt>exp</tt> to current timestamp + seconds.
 	 * 
-	 * @param seconds
+	 * @param seconds expires within seconds
 	 * 
 	 * @return {@link JwtTokenBuilder}
 	 */
@@ -258,7 +261,7 @@ public class JwtTokenBuilder {
 	/**
 	 * Specify algorithm to sign JWT with. Default is HS256.
 	 * 
-	 * @param algorithm
+	 * @param algorithm signing algorithm
 	 * 
 	 * @return {@link JwtTokenBuilder}
 	 */
@@ -271,7 +274,7 @@ public class JwtTokenBuilder {
 	 * Should JWT claim <tt>iat</tt> be added?
 	 * Value will be set to current timestamp
 	 * 
-	 * @param issuedAt
+	 * @param issuedAt true to add
 	 * 
 	 * @return {@link JwtTokenBuilder}
 	 */
@@ -284,7 +287,7 @@ public class JwtTokenBuilder {
 	 * Should JWT claim <tt>jti</tt> be added?
 	 * Value will be set to a pseudo random unique value (UUID)
 	 * 
-	 * @param jwtId
+	 * @param jwtId true to add
 	 * 
 	 * @return {@link JwtTokenBuilder}
 	 */
@@ -296,7 +299,7 @@ public class JwtTokenBuilder {
 	/**
 	 * Add JWT claim <tt>nbf</tt> to current timestamp - notValidBeforeLeeway
 	 * 
-	 * @param notValidBeforeLeeway
+	 * @param notValidBeforeLeeway in seconds
 	 * 
 	 * @return {@link JwtTokenBuilder}
 	 */

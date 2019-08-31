@@ -27,8 +27,8 @@ public abstract class ResponseWriter {
 	 * <li>text/html is default</li>
 	 * </ul>
 	 * 
-	 * @param mimeType
-	 * @return
+	 * @param mimeType accepted mimetype from client
+	 * @return a new {@link ResponseWriter} instance
 	 */
 	public static ResponseWriter get(String mimeType) {
 		String nullSafeMimeType = mimeType != null ? mimeType : "";
@@ -44,10 +44,10 @@ public abstract class ResponseWriter {
 	/**
 	 * Write body values to response with provided status code. Body serialization depends on concrete class
 	 * 
-	 * @param response
-	 * @param statusCode
-	 * @param body
-	 * @throws IOException
+	 * @param response HTTP response object
+	 * @param statusCode response status code to set
+	 * @param body response body
+	 * @throws IOException exception on writing response data to response object
 	 */
 	public abstract void write(Response response, int statusCode, Object body) throws IOException;
 }
