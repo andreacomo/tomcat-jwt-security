@@ -38,7 +38,7 @@ import java.util.stream.Stream;
  * @author acomo
  *
  */
-abstract class JwtTokenValve extends ValveBase {
+public abstract class JwtTokenValve extends ValveBase {
 
 	private static final Log LOG = LogFactory.getLog(JwtTokenValve.class);
 

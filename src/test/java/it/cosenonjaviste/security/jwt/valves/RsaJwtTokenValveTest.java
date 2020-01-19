@@ -194,6 +194,30 @@ public class RsaJwtTokenValveTest {
         }
     }
 
+    @Test
+    public void shouldPassWithKeyStoreSetFromOutside() throws Exception {
+        SecurityConstraint securityConstraint = new SecurityConstraint();
+        securityConstraint.setAuthConstraint(true);
+        when(realm.findSecurityConstraints(request, request.getContext()))
+                .thenReturn(new SecurityConstraint[] { securityConstraint });
+        when(request.getHeader(JwtConstants.AUTH_HEADER)).thenReturn(
+                getTestToken());
+
+        RsaJwtTokenValve valve = new RsaJwtTokenValve();
+        valve.setContainer(container);
+        valve.setNext(nextValve);
+        valve.setKeyStore(KeyStores.get());
+        valve.initInternal();
+
+        valve.invoke(request, response);
+
+        InOrder inOrder = inOrder(request, nextValve);
+        inOrder.verify(request).getHeader(JwtConstants.AUTH_HEADER);
+        inOrder.verify(request).setUserPrincipal(any(UserPrincipal.class));
+        inOrder.verify(request).setAuthType("TOKEN");
+        inOrder.verify(nextValve).invoke(request, response);
+    }
+
     /**
      * @throws Exception
      */

@@ -1,6 +1,5 @@
 package it.cosenonjaviste.security.jwt.valves;
 
-import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
 import it.cosenonjaviste.security.jwt.exceptions.ValveInitializationException;
 import it.cosenonjaviste.security.jwt.utils.Preconditions;
@@ -30,6 +29,8 @@ public class RsaJwtTokenValve extends JwtTokenValve {
 
     private String keyPairsAlias;
 
+    private KeyStore keyStore;
+
     /**
      * Creates a {@link JwtTokenVerifier} instance from keystore
      *
@@ -37,10 +38,8 @@ public class RsaJwtTokenValve extends JwtTokenValve {
      */
     @Override
     protected JwtTokenVerifier createTokenVerifier() {
-        try (InputStream in = new FileInputStream(keystorePath)) {
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keyStore.load(in, keystorePassword.toCharArray());
-
+        try {
+            KeyStore keyStore = getKeyStore();
             String alias = keyPairsAlias == null ? keyStore.aliases().nextElement() : keyPairsAlias;
             Certificate certificate = keyStore.getCertificate(alias);
             Preconditions.checkValveInit(certificate != null, "Alias '" + alias + "' not found in keystore");
@@ -63,6 +62,30 @@ public class RsaJwtTokenValve extends JwtTokenValve {
                     return null;
                 }
             });
+        } catch (KeyStoreException e) {
+            LOG.error(e.getMessage(), e);
+            throw new ValveInitializationException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * If keystore is set from external call to {@link #setKeyStore}, keystorePath and keystorePassword will be ignored
+     *
+     * @return {@link KeyStore} instance
+     */
+    private KeyStore getKeyStore() {
+        if (keyStore == null) {
+            keyStore = loadKeyStore();
+        }
+        return keyStore;
+    }
+
+    private KeyStore loadKeyStore() {
+        try (InputStream in = new FileInputStream(keystorePath)) {
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keyStore.load(in, keystorePassword.toCharArray());
+
+            return keyStore;
         } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException e) {
             LOG.error(e.getMessage(), e);
             throw new ValveInitializationException(e.getMessage(), e);
@@ -79,5 +102,9 @@ public class RsaJwtTokenValve extends JwtTokenValve {
 
     public void setKeyPairsAlias(String keyPairsAlias) {
         this.keyPairsAlias = keyPairsAlias;
+    }
+
+    public void setKeyStore(KeyStore keyStore) {
+        this.keyStore = keyStore;
     }
 }
