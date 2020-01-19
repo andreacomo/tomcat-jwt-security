@@ -24,6 +24,10 @@ public class JwtTokenVerifier {
 	
 	private VerifierStrategy verifierStrategy;
 
+	private String customUserIdClaim;
+
+	private String customRolesClaim;
+
 	private JwtTokenVerifier() {
 
 	}
@@ -42,6 +46,23 @@ public class JwtTokenVerifier {
 	}
 
 	/**
+	 * Creates a new instance of {@link JwtTokenVerifier} class for HMAC and secret text sign
+	 *
+	 * @param secret secret phrase
+	 * @param customUserIdClaim claim to use for identifying user id
+	 * @param customRolesClaim claim to use fot identifies user roles
+	 *
+	 * @return a new instance of {@link JwtTokenVerifier} class
+	 */
+	public static JwtTokenVerifier create(String secret, String customUserIdClaim, String customRolesClaim) {
+		JwtTokenVerifier tokenVerifier = new JwtTokenVerifier();
+		tokenVerifier.verifierStrategy = new HmacSignedVerifierStrategy(secret);
+		tokenVerifier.customUserIdClaim = customUserIdClaim;
+		tokenVerifier.customRolesClaim = customRolesClaim;
+		return tokenVerifier;
+	}
+
+	/**
 	 * Creates a new instance of {@link JwtTokenVerifier} class for RSA and certificate verification
 	 *
 	 * @param rsaKeyProvider key provider
@@ -51,6 +72,23 @@ public class JwtTokenVerifier {
 	public static JwtTokenVerifier create(RSAKeyProvider rsaKeyProvider) {
 		JwtTokenVerifier tokenVerifier = new JwtTokenVerifier();
 		tokenVerifier.verifierStrategy = new RsaSignedVerifierStrategy(rsaKeyProvider);
+		return tokenVerifier;
+	}
+
+	/**
+	 * Creates a new instance of {@link JwtTokenVerifier} class for RSA and certificate verification
+	 *
+	 * @param rsaKeyProvider key provider
+	 * @param customUserIdClaim claim to use for identifying user id
+	 * @param customRolesClaim claim to use fot identifies user roles
+	 *
+	 * @return a new instance of {@link JwtTokenVerifier} class
+	 */
+	public static JwtTokenVerifier create(RSAKeyProvider rsaKeyProvider, String customUserIdClaim, String customRolesClaim) {
+		JwtTokenVerifier tokenVerifier = new JwtTokenVerifier();
+		tokenVerifier.verifierStrategy = new RsaSignedVerifierStrategy(rsaKeyProvider);
+		tokenVerifier.customUserIdClaim = customUserIdClaim;
+		tokenVerifier.customRolesClaim = customRolesClaim;
 		return tokenVerifier;
 	}
 
@@ -66,6 +104,6 @@ public class JwtTokenVerifier {
 	public JwtAdapter verify(String token) {
 		DecodedJWT decodedJWT = JWT.decode(token);
 		Algorithm algorithm = verifierStrategy.verify(decodedJWT);
-		return new JwtAdapter(algorithm, decodedJWT);
+		return new JwtAdapter(algorithm, decodedJWT, customUserIdClaim, customRolesClaim);
 	}
 }

@@ -31,13 +31,8 @@ public class RsaJwtTokenValve extends JwtTokenValve {
 
     private KeyStore keyStore;
 
-    /**
-     * Creates a {@link JwtTokenVerifier} instance from keystore
-     *
-     * @return {@link JwtTokenVerifier} instance
-     */
     @Override
-    protected JwtTokenVerifier createTokenVerifier() {
+    protected JwtTokenVerifier createTokenVerifier(String customUserIdClaim, String customRolesClaim) {
         try {
             KeyStore keyStore = getKeyStore();
             String alias = keyPairsAlias == null ? keyStore.aliases().nextElement() : keyPairsAlias;
@@ -46,26 +41,30 @@ public class RsaJwtTokenValve extends JwtTokenValve {
 
             final PublicKey publicKey = certificate.getPublicKey();
 
-            return JwtTokenVerifier.create(new RSAKeyProvider() {
-                @Override
-                public RSAPublicKey getPublicKeyById(String keyId) {
-                    return (RSAPublicKey) publicKey;
-                }
-
-                @Override
-                public RSAPrivateKey getPrivateKey() {
-                    return null;
-                }
-
-                @Override
-                public String getPrivateKeyId() {
-                    return null;
-                }
-            });
+            return JwtTokenVerifier.create(newRsaKeyProvider((RSAPublicKey) publicKey), customUserIdClaim, customRolesClaim);
         } catch (KeyStoreException e) {
             LOG.error(e.getMessage(), e);
             throw new ValveInitializationException(e.getMessage(), e);
         }
+    }
+
+    private RSAKeyProvider newRsaKeyProvider(RSAPublicKey publicKey) {
+        return new RSAKeyProvider() {
+            @Override
+            public RSAPublicKey getPublicKeyById(String keyId) {
+                return publicKey;
+            }
+
+            @Override
+            public RSAPrivateKey getPrivateKey() {
+                return null;
+            }
+
+            @Override
+            public String getPrivateKeyId() {
+                return null;
+            }
+        };
     }
 
     /**

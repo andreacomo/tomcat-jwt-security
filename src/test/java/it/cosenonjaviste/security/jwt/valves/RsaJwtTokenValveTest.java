@@ -64,6 +64,8 @@ public class RsaJwtTokenValveTest {
         jwtValve.setNext(nextValve);
         jwtValve.setKeystorePath("target/test-classes/" + KeyStores.KEYSTORE);
         jwtValve.setKeystorePassword(KeyStores.KEYSTORE_PASSWORD);
+        jwtValve.setCustomUserIdClaim(null);
+        jwtValve.setCustomRolesClaim(null);
 
         when(container.getRealm()).thenReturn(realm);
         when(request.getContext()).thenReturn(context);
@@ -210,6 +212,31 @@ public class RsaJwtTokenValveTest {
         valve.initInternal();
 
         valve.invoke(request, response);
+
+        InOrder inOrder = inOrder(request, nextValve);
+        inOrder.verify(request).getHeader(JwtConstants.AUTH_HEADER);
+        inOrder.verify(request).setUserPrincipal(any(UserPrincipal.class));
+        inOrder.verify(request).setAuthType("TOKEN");
+        inOrder.verify(nextValve).invoke(request, response);
+    }
+
+    @Test
+    public void shouldRenewTokenWithCustomClaims() throws Exception {
+        SecurityConstraint securityConstraint = new SecurityConstraint();
+        securityConstraint.setAuthConstraint(true);
+        when(realm.findSecurityConstraints(request, request.getContext()))
+                .thenReturn(new SecurityConstraint[]{securityConstraint});
+        when(request.getHeader(JwtConstants.AUTH_HEADER)).thenReturn(
+                JWT.create()
+                        .withSubject("test")
+                        .withArrayClaim("authorities", new String[]{"role1", "role2"})
+                        .withIssuedAt(new Date())
+                        .sign(Algorithm.RSA256(KEY_PROVIDER)));
+
+        jwtValve.setCustomUserIdClaim("sub");
+        jwtValve.setCustomRolesClaim("authorities");
+        jwtValve.initInternal();
+        jwtValve.invoke(request, response);
 
         InOrder inOrder = inOrder(request, nextValve);
         inOrder.verify(request).getHeader(JwtConstants.AUTH_HEADER);

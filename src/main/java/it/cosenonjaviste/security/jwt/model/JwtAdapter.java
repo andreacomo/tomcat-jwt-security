@@ -12,9 +12,19 @@ public class JwtAdapter {
 
     private DecodedJWT jwt;
 
+    private String userIdClaim;
+
+    private String rolesClaim;
+
     public JwtAdapter(Algorithm algorithm, DecodedJWT jwt) {
+        this(algorithm, jwt, JwtConstants.USER_ID, JwtConstants.ROLES);
+    }
+
+    public JwtAdapter(Algorithm algorithm, DecodedJWT jwt, String userIdClaim, String rolesClaim) {
         this.algorithm = algorithm;
         this.jwt = jwt;
+        this.userIdClaim = userIdClaim != null ? userIdClaim : JwtConstants.USER_ID;
+        this.rolesClaim = rolesClaim != null ? rolesClaim: JwtConstants.ROLES;
     }
 
     /**
@@ -23,7 +33,7 @@ public class JwtAdapter {
      * @return <tt>userId</tt> value
      */
     public String getUserId() {
-        return this.jwt.getClaim(JwtConstants.USER_ID).asString();
+        return this.jwt.getClaim(userIdClaim).asString();
     }
 
     /**
@@ -32,7 +42,7 @@ public class JwtAdapter {
      * @return <tt>roles</tt> value collection
      */
     public List<String> getRoles() {
-        return this.jwt.getClaim(JwtConstants.ROLES).asList(String.class);
+        return this.jwt.getClaim(rolesClaim).asList(String.class);
     }
 
     /**
@@ -49,5 +59,19 @@ public class JwtAdapter {
      */
     public Algorithm getAlgorithm() {
         return algorithm;
+    }
+
+    /**
+     * @return custom user id claim
+     */
+    public String getUserIdClaim() {
+        return userIdClaim;
+    }
+
+    /**
+     * @return custom roles claim
+     */
+    public String getRolesClaim() {
+        return rolesClaim;
     }
 }

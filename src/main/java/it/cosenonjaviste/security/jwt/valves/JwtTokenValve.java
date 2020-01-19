@@ -46,13 +46,25 @@ public abstract class JwtTokenValve extends ValveBase {
 
 	private String cookieName;
 
+	private String customUserIdClaim;
+
+	private String customRolesClaim;
+
 	@Override
 	protected void initInternal() throws LifecycleException {
 		super.initInternal();
-		this.tokenVerifier = createTokenVerifier();
+		this.tokenVerifier = createTokenVerifier(customUserIdClaim, customRolesClaim);
 	}
 
-	protected abstract JwtTokenVerifier createTokenVerifier();
+	/**
+	 * Creates a {@link JwtTokenVerifier} instance from keystore
+	 *
+	 * @param customUserIdClaim claim to use for identifying user id
+	 * @param customRolesClaim claim to use fot identifies user roles
+	 *
+	 * @return {@link JwtTokenVerifier} instance
+	 */
+	protected abstract JwtTokenVerifier createTokenVerifier(String customUserIdClaim, String customRolesClaim);
 
 	@Override
 	public void invoke(Request request, Response response) throws IOException,
@@ -160,5 +172,13 @@ public abstract class JwtTokenValve extends ValveBase {
 
 	public void setCookieName(String cookieName) {
 		this.cookieName = cookieName;
+	}
+
+	public void setCustomUserIdClaim(String customUserIdClaim) {
+		this.customUserIdClaim = customUserIdClaim;
+	}
+
+	public void setCustomRolesClaim(String customRolesClaim) {
+		this.customRolesClaim = customRolesClaim;
 	}
 }

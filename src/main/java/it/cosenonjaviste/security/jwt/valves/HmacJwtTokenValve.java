@@ -13,8 +13,8 @@ public class HmacJwtTokenValve extends JwtTokenValve {
     private boolean updateExpire;
 
     @Override
-    protected JwtTokenVerifier createTokenVerifier() {
-        return JwtTokenVerifier.create(secret);
+    protected JwtTokenVerifier createTokenVerifier(String customUserIdClaim, String customRolesClaim) {
+        return JwtTokenVerifier.create(secret, customUserIdClaim, customRolesClaim);
     }
 
     protected void beforeNext(Response response, JwtAdapter jwt) {

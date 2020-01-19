@@ -34,8 +34,31 @@ public class JwtTokenBuilder {
 
 	private Algorithm algorithm;
 
+	private String customUserIdClaim;
+
+	private String customRolesClaim;
+
 	private JwtTokenBuilder() {
 		
+	}
+
+	/**
+	 * Creates a new {@link JwtTokenBuilder} instance
+	 *
+	 * @param algorithm to use for encoding
+	 * @param customUserIdClaim custom user id claim
+	 * @param customRolesClaim custom roles claim
+	 *
+	 * @return a new {@link JwtTokenBuilder} instance
+	 */
+	public static JwtTokenBuilder create(Algorithm algorithm, String customUserIdClaim, String customRolesClaim) {
+		JwtTokenBuilder builder = new JwtTokenBuilder();
+		builder.algorithm = algorithm;
+		builder.optionsAdapter.setIssuedAt(true);
+		builder.customUserIdClaim = customUserIdClaim != null ? customUserIdClaim : JwtConstants.USER_ID;
+		builder.customRolesClaim = customRolesClaim != null ? customRolesClaim : JwtConstants.ROLES;
+
+		return builder;
 	}
 
 	/**
@@ -46,11 +69,7 @@ public class JwtTokenBuilder {
 	 * @return a new {@link JwtTokenBuilder} instance
 	 */
 	public static JwtTokenBuilder create(Algorithm algorithm) {
-		JwtTokenBuilder builder = new JwtTokenBuilder();
-		builder.algorithm = algorithm;
-		builder.optionsAdapter.setIssuedAt(true);
-
-		return builder;
+		return create(algorithm, JwtConstants.USER_ID, JwtConstants.ROLES);
 	}
 
 	/**
@@ -77,7 +96,7 @@ public class JwtTokenBuilder {
 	 * @throws IllegalStateException if token is not verified by provided verifier
 	 */
 	public static JwtTokenBuilder from(JwtAdapter jwt) {
-		JwtTokenBuilder builder = create(jwt.getAlgorithm());
+		JwtTokenBuilder builder = create(jwt.getAlgorithm(), jwt.getUserIdClaim(), jwt.getRolesClaim());
 		DecodedJWT decodedJWT = jwt.getDecodedJWT();
 		restoreInternalStatus(builder, decodedJWT);
 		return builder;
@@ -102,14 +121,29 @@ public class JwtTokenBuilder {
 	 *
 	 * @param token a jwt as String
 	 * @param secret secret text
+	 * @param customUserIdClaim custom user id claim
+	 * @param customRolesClaim custom roles claim
 	 *
 	 * @return a new {@link JwtTokenBuilder} instance
 	 *
 	 * @throws IllegalStateException if token is not verified by provided verifier
 	 */
-	public static JwtTokenBuilder from(String token, String secret) {
-		JwtAdapter jwtAdapter = JwtTokenVerifier.create(secret).verify(token);
+	public static JwtTokenBuilder from(String token, String secret, String customUserIdClaim, String customRolesClaim) {
+		JwtAdapter jwtAdapter = JwtTokenVerifier.create(secret, customUserIdClaim, customRolesClaim)
+				.verify(token);
 		return from(jwtAdapter);
+	}
+
+	/**
+	 * See {@link #from(String, String, String, String)}
+	 *
+	 * @param token a jwt as String
+	 * @param secret secret text
+	 *
+	 * @return a new {@link JwtTokenBuilder} instance
+	 */
+	public static JwtTokenBuilder from(String token, String secret) {
+		return from(token, secret, JwtConstants.USER_ID, JwtConstants.ROLES);
 	}
 	
 	private static void restoreInternalStatus(JwtTokenBuilder builder, DecodedJWT decodedJWT) {
@@ -142,7 +176,7 @@ public class JwtTokenBuilder {
 	 * @return {@link JwtTokenBuilder}
 	 */
 	public JwtTokenBuilder userId(String name) {
-		claims.put(JwtConstants.USER_ID, name);
+		claims.put(customUserIdClaim, name);
 
 		return this;
 	}
@@ -155,7 +189,7 @@ public class JwtTokenBuilder {
 	 * @return {@link JwtTokenBuilder}
 	 */
 	public JwtTokenBuilder roles(Collection<String> roles) {
-		claims.put(JwtConstants.ROLES, roles.toArray(new String[]{}));
+		claims.put(customRolesClaim, roles.toArray(new String[]{}));
 
 		return this;
 	}
@@ -240,10 +274,10 @@ public class JwtTokenBuilder {
 	 * 
 	 * @return JWT token
 	 * 
-	 * @throws IllegalStateException if <tt>userId</tt> and <tt>roles</tt> are not provided
+	 * @throws IllegalStateException if <tt>userId</tt> and <tt>roles</tt> (or their custom variants) are not provided
 	 */
 	public String build() {
-		Preconditions.checkState(claims.containsKey(JwtConstants.USER_ID) && claims.containsKey(JwtConstants.ROLES), "userId and roles claims must be added!");
+		Preconditions.checkState(claims.containsKey(customUserIdClaim) && claims.containsKey(customRolesClaim), customUserIdClaim + " and " + customRolesClaim + " claims must be added!");
 		return jwtBuilder.sign(algorithm);
 	}
 }
