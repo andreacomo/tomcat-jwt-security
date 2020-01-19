@@ -19,7 +19,7 @@ public class JwtTokenBuilderTest {
     private static final String SECRET = "my secret";
 
     @Test
-    public void shouldContains5Claims() throws Exception {
+    public void shouldContains5Claims() {
         String token = createToken();
 
         assertNotNull(token);
@@ -42,12 +42,12 @@ public class JwtTokenBuilderTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void shouldBeEmptyAndInvalid() throws Exception {
-        JwtTokenBuilder.create(SECRET).build();
+    public void shouldBeEmptyAndInvalid() {
+        JwtTokenBuilder.create(Algorithm.HMAC256(SECRET)).build();
     }
 
     @Test
-    public void shouldParseJwtFromString() throws Exception {
+    public void shouldParseJwtFromString() {
         String token = createToken();
 
         assertNotNull(token);
@@ -118,7 +118,7 @@ public class JwtTokenBuilderTest {
     }
 
     @Test
-    public void shouldKeepAlgorithmFromVerifier() throws Exception {
+    public void shouldKeepAlgorithmFromVerifier() {
         Algorithm algorithm = Algorithm.HMAC512(SECRET);
         String token = createToken(algorithm);
         JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
@@ -136,7 +136,7 @@ public class JwtTokenBuilderTest {
     }
 
     private String createToken() {
-        return JwtTokenBuilder.create(SECRET)
+        return JwtTokenBuilder.create(Algorithm.HMAC256(SECRET))
                 .userId("test")
                 .roles(Arrays.asList("role1", "role2"))
                 .expirySecs(10000)

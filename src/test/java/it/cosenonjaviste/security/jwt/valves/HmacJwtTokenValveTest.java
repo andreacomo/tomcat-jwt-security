@@ -1,11 +1,9 @@
 package it.cosenonjaviste.security.jwt.valves;
 
+import com.auth0.jwt.algorithms.Algorithm;
 import it.cosenonjaviste.security.jwt.utils.JwtConstants;
 import it.cosenonjaviste.security.jwt.utils.JwtTokenBuilder;
-import org.apache.catalina.Container;
-import org.apache.catalina.Context;
-import org.apache.catalina.Realm;
-import org.apache.catalina.Valve;
+import org.apache.catalina.*;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
@@ -24,11 +22,11 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class JwtTokenValveTest {
+public class HmacJwtTokenValveTest {
 
 	private static final String SECRET = "my secret";
 
-	private JwtTokenValve jwtValve = new JwtTokenValve();
+	private HmacJwtTokenValve jwtValve = new HmacJwtTokenValve();
 
 	// Catalina mocks
 	@Mock
@@ -50,13 +48,15 @@ public class JwtTokenValveTest {
 	private Valve nextValve;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws LifecycleException {
 		jwtValve.setContainer(container);
 		jwtValve.setNext(nextValve);
 		jwtValve.setSecret(SECRET);
 
 		when(container.getRealm()).thenReturn(realm);
 		when(request.getContext()).thenReturn(context);
+
+		jwtValve.initInternal();
 	}
 
 	/**
@@ -214,7 +214,7 @@ public class JwtTokenValveTest {
 		jwtValve.invoke(request, response);
 
 		verify(request).getHeader(JwtConstants.AUTH_HEADER);
-		verify(response).sendError(401, "Token not valid. Please login first");
+		verify(response).sendError(401, "Token not valid. Cause: The Token's Signature resulted invalid when verified using the Algorithm: HmacSHA256");
 	}
 
 	/**
@@ -236,8 +236,11 @@ public class JwtTokenValveTest {
 	}
 
 	private String getTestToken() {
-		return JwtTokenBuilder.create(SECRET).userId("test")
-				.roles(Arrays.asList("role1", "role2")).expirySecs(10000).build();
+		return JwtTokenBuilder.create(Algorithm.HMAC256(SECRET))
+				.userId("test")
+				.roles(Arrays.asList("role1", "role2"))
+				.expirySecs(10000)
+				.build();
 	}
 
 	private Cookie[] newCookies(String cookieName) {

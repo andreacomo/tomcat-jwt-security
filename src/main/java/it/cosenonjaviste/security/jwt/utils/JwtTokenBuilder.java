@@ -37,17 +37,6 @@ public class JwtTokenBuilder {
 	private JwtTokenBuilder() {
 		
 	}
-	
-	/**
-	 * Creates a new {@link JwtTokenBuilder} instance, using HMAC256 algorithm
-	 * 
-	 * @param secret secret phrase
-	 * 
-	 * @return a new {@link JwtTokenBuilder} instance
-	 */
-	public static JwtTokenBuilder create(String secret) {
-		return create(Algorithm.HMAC256(secret));
-	}
 
 	/**
 	 * Creates a new {@link JwtTokenBuilder} instance

@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.auth0.jwt.interfaces.RSAKeyProvider;
 import it.cosenonjaviste.security.jwt.model.JwtAdapter;
 
 import java.nio.file.attribute.UserPrincipal;
@@ -28,7 +29,7 @@ public class JwtTokenVerifier {
 	}
 	
 	/**
-	 * Creates a new instance of {@link JwtTokenVerifier} class
+	 * Creates a new instance of {@link JwtTokenVerifier} class for HMAC and secret text sign
 	 * 
 	 * @param secret secret phrase
 	 * 
@@ -36,7 +37,20 @@ public class JwtTokenVerifier {
 	 */
 	public static JwtTokenVerifier create(String secret) {
 		JwtTokenVerifier tokenVerifier = new JwtTokenVerifier();
-		tokenVerifier.verifierStrategy = new HmacSecretTextVerifierStrategy(secret);
+		tokenVerifier.verifierStrategy = new HmacSignedVerifierStrategy(secret);
+		return tokenVerifier;
+	}
+
+	/**
+	 * Creates a new instance of {@link JwtTokenVerifier} class for RSA and certificate verification
+	 *
+	 * @param rsaKeyProvider key provider
+	 *
+	 * @return a new instance of {@link JwtTokenVerifier} class
+	 */
+	public static JwtTokenVerifier create(RSAKeyProvider rsaKeyProvider) {
+		JwtTokenVerifier tokenVerifier = new JwtTokenVerifier();
+		tokenVerifier.verifierStrategy = new RsaSignedVerifierStrategy(rsaKeyProvider);
 		return tokenVerifier;
 	}
 
