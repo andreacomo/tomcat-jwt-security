@@ -11,14 +11,14 @@ Valve-based authentication is supposed to work along with Java **standard securi
 From version 3.0.0, several improvements have been made (with *many breaking changes* - please refers to release notes).
 Now you can take advantages of signing and verifying your JWT tokens with:
 
- * *HMAC* algorithms, providing a **secret text** (the legacy approach, available since versions 2.x.x)
- * *RSA* algorithms, providing a **keystore with a public key** 
- * **OpenID Connect** JWT ID tokens are supported.
+ * **HMAC** algorithms, providing a **secret text** (the legacy approach, available since versions 2.x.x)
+ * **RSA** algorithms, providing a **keystore with a public key** 
+ * **OpenID Connect** (OIDC) JWT ID Tokens are now validated against **public keys** downloaded from a valid JWKS uri, provided by your OIDC Identity Provider
 
 # Getting started
 You can download artifacts (1.a) or build the project on your own (1.b), then configure Tomcat and your security constraints in your project to enable authentication system. 
 
-Finally, read how to create tokens in your app.
+Finally, read how to create tokens in your app, if you sign your tokens with HMAC or RSA.
 
 ## 1.a Download artifacts
 Download artifacts (project and dependencies), from Maven Central Repo, when using HMAC (`HmacJwtTokenValve`) or RSA (`RsaJwtTokenValve`) valves:
@@ -35,7 +35,7 @@ If you need to use OpenID Connect valve (`OidcJwtTokenValve`), you need further 
     * [guava-27.1-jre.jar](https://repo1.maven.org/maven2/com/google/guava/guava/27.1-jre/guava-27.1-jre.jar)
       * [failureaccess-1.0.1.jar](https://repo1.maven.org/maven2/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar)
 
-and place into *TOMCAT_HOME/lib* directory
+Place dependencies into *TOMCAT_HOME/lib* directory
 
 ## 1.b Build project
 You can build with a simple
@@ -54,7 +54,7 @@ Now it's time to register the valve. According to your signing method or token p
      | --- | --- | --- | --- | --- |
      | `secret` | String | Y | | Passphrase used to verify the token sign. Since HMAC is a sync algorithm, it's also used to recreate and sign the token when `updateExpire` is `true` | 
      | `updateExpire` | Boolean | N | `false` | Each request produces a new token in `X-Auth` response header with a delayed expire time. This simulates default Servlet HTTP Session behaviour |
-     | `cookieName` | String | N | | Name of the cookie containing JWT token |
+     | `cookieName` | String | N | | Name of the cookie containing JWT token instead of HTTP headers |
      | `customUserIdClaim` | String | N | `userId` | Claim that identify the user id |
      | `customRolesClaim`| String | N | `roles` | Claim that identify user capabilities |
      
@@ -76,7 +76,7 @@ Now it's time to register the valve. According to your signing method or token p
       | `keystorePassword` | String | Y* | | Keystore password |
       | `keyPairsAlias`| String | N | the first one in keystore | Keys pairs alias in keystore. If not provided, the first *public key* in keystore will be used |
       | `keyStore` | Keystore | Y** | | Keystore instance (useful when keystore is in classpath and is java-based configured) |
-      | `cookieName` | String | N | | Name of the cookie containing JWT token |
+      | `cookieName` | String | N | | Name of the cookie containing JWT token instead of HTTP headers |
       | `customUserIdClaim` | String | N | `userId` | Claim that identify the user id |
       | `customRolesClaim`| String | N | `roles` | Claim that identify user capabilities |
       
@@ -92,14 +92,14 @@ Now it's time to register the valve. According to your signing method or token p
                  customRolesClaim="authorities" />
       ```
    
- * `OidcJwtTokenValve`: to be used when tokens provided by an OpenID Connect Identity Provider (OIDC IDP).
+ * `OidcJwtTokenValve`: to be used when tokens are provided by an OpenID Connect Identity Provider (OIDC IDP).
    Configurable parameters are:
      
      | Parameter | Type | Mandatory | Default | Description |
      | --- | --- | --- | --- | --- |
-     | `issuerUrl` | URL | Y | | URL where to retrieve IDP keys: it's `jwks_uri` key of `.well-known/openid-configuration` endpoint provided by your IDP  | 
-     | `supportedAudiences` | String | N | | Allowed `aud` values in token. If `supportedAudiences` is not set, no validation is performed |
-     | `expiresIn` | Integer | N | 60 | Keys duration cache before recontact IDP for keys |
+     | `issuerUrl` | URL | Y | | URL where to retrieve IDP keys: it's the value of `jwks_uri` key of `.well-known/openid-configuration` endpoint provided by your IDP  | 
+     | `supportedAudiences` | String | N | | Allowed `aud` values in token. If `supportedAudiences` is not set, **no validation** is performed |
+     | `expiresIn` | Integer | N | 60 | Cache duration of keys before recontact IDP for new keys |
      | `timeUnit` | TimeUnit | N | MINUTES | Cache time unit. Allowed values are: `NANOSECONDS`, `MICROSECONDS`, `MILLISECONDS`, `SECONDS`, `MINUTES`, `HOURS`, `DAYS` |
      | `customUserIdClaim` | String | N | `sub` | Claim that identify the user id |
      | `customRolesClaim`| String | N | `authorities` | Claim that identify user capabilities |
@@ -108,13 +108,13 @@ Now it's time to register the valve. According to your signing method or token p
    
    ```xml
    <Valve className="it.cosenonjaviste.security.jwt.valves.OidcJwtTokenValve" 
-   	  		 issuerUrl="http://idp.example.com/openid-connect/certs"
+             issuerUrl="http://idp.example.com/openid-connect/certs"
              expiresIn="30"
-   	  		 timeUnit="MINUTES" />
+             timeUnit="MINUTES" />
    ```
     
 Valves can be configured in Tomcat in:
-* `server.xml` for registering valve at **Engine** or **Host** level (for SSO purpose)
+* `server.xml` for registering valve at **Engine** or **Host** level
 * `context.xml` for registering valve at application **Context** level
 
 In order for the valve to work, a **realm should be provided**. An example for a JDBCRealm can be found on [a post on TheJavaGeek](http://www.thejavageek.com/2013/07/07/configure-jdbcrealm-jaas-for-mysql-and-tomcat-7-with-form-based-authentication/)
@@ -148,11 +148,14 @@ Please note `<auth-method>` tag: is set to **BASIC** in order to *avoid HTTP Ses
 Now your server is ready. How to generate a token from your app?
 
 # How to integrate in your project
+
+## HMAC and RSA
 `HmacJwtTokenValve` and `RsaJwtTokenValve` inherits from an abstract `JwtTokenValve` that is supposed to search for authentication token according to these priorities:
  * in `X-Auth` *header param* 
  * in `Authorization` *header param* with token preceded by `Bearer ` type 
  * in `access_token` *query parameter* (useful for downloading a file for example)
- * in a `cookie`. The cookie's name is done by valve parameter *cookieName*
+ * in a `cookie`: cookie's name is set by valve parameter *cookieName*
+
 Your login controller **must** create a token in order to be validated: *each following request* to protected application must contain one of the authentication methods above.
 
 You can use classes provided by *[java-jwt project](https://github.com/auth0/java-jwt)* (recommended), for example:
@@ -195,7 +198,10 @@ String token = JwtTokenBuilder.create(Algorithm.HMAC256("my super secret passwor
 response.addHeader(JwtConstants.AUTH_HEADER, token);
 ```
 
-Enjoy your stateless security system on Tomcat!!
+## OpenID Connect
+In case of `OidcJwtTokenValve`, you *don't need a login controller*: just set your JWT token in every HTTP header `Authorization`, preceded by `Bearer`.
+
+Enjoy now your stateless security system on Tomcat!!
 
 # JWT Valve and Spring Boot
 If you want to use this Valve with **Embedded Tomcat** provided by *Spring Boot*, forget about `web.xml` or `context.xml`!
