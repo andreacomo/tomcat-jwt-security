@@ -4,8 +4,6 @@
 # tomcat-jwt-security
 This project aims to bring JWT token authentication capabilities into **Tomcat 8**, implementing an authentication filter as a Tomcat Valve. JWT manipulation is based on [java-jwt](https://github.com/auth0/java-jwt) project.
 
-From version `3.0.0`, **OpenID Connect** JWT ID tokens are supported.
-
 For Tomcat 7, please use [version 1.1.0](https://github.com/andreacomo/tomcat-jwt-security/releases/tag/tomcat-jwt-security-1.1.0) or clone [tomcat-7 branch](https://github.com/andreacomo/tomcat-jwt-security/tree/tomcat-7).
 
 Valve-based authentication is supposed to work along with Java **standard security constraints** placed in your *web.xml* file and will leave your server **stateless**: with a JWT token you can keep your Tomcat *free of http session*.
@@ -13,8 +11,9 @@ Valve-based authentication is supposed to work along with Java **standard securi
 From version 3.0.0, several improvements have been made (with *many breaking changes* - please refers to release notes).
 Now you can take advantages of signing and verifying your JWT tokens with:
 
- * HMAC algorithms, providing a **secret text** (the legacy approach, available since versions 2.x.x)
- * RSA algorithms, providing a **keystore with a public key** 
+ * *HMAC* algorithms, providing a **secret text** (the legacy approach, available since versions 2.x.x)
+ * *RSA* algorithms, providing a **keystore with a public key** 
+ * **OpenID Connect** JWT ID tokens are supported.
 
 # Getting started
 You can download artifacts (1.a) or build the project on your own (1.b), then configure Tomcat and your security constraints in your project to enable authentication system. 
