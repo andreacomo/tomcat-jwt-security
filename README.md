@@ -4,6 +4,8 @@
 # tomcat-jwt-security
 This project aims to bring JWT token authentication capabilities into **Tomcat 8**, implementing an authentication filter as a Tomcat Valve. JWT manipulation is based on [java-jwt](https://github.com/auth0/java-jwt) project.
 
+From version `3.0.0`, **OpenID Connect** JWT ID tokens are supported.
+
 For Tomcat 7, please use [version 1.1.0](https://github.com/andreacomo/tomcat-jwt-security/releases/tag/tomcat-jwt-security-1.1.0) or clone [tomcat-7 branch](https://github.com/andreacomo/tomcat-jwt-security/tree/tomcat-7).
 
 Valve-based authentication is supposed to work along with Java **standard security constraints** placed in your *web.xml* file and will leave your server **stateless**: with a JWT token you can keep your Tomcat *free of http session*.
@@ -20,11 +22,19 @@ You can download artifacts (1.a) or build the project on your own (1.b), then co
 Finally, read how to create tokens in your app.
 
 ## 1.a Download artifacts
-Download artifacts (project and dependencies) from Maven Central Repo
+Download artifacts (project and dependencies), from Maven Central Repo, when using HMAC (`HmacJwtTokenValve`) or RSA (`RsaJwtTokenValve`) valves:
 * [tomcat-jwt-security-3.0.0.jar](https://repo1.maven.org/maven2/it/cosenonjaviste/tomcat-jwt-security/3.0.0/tomcat-jwt-security-3.0.0.jar)
-  * [java-jwt-3.8.2.jar](https://repo1.maven.org/maven2/com/auth0/java-jwt/3.8.2/java-jwt-3.8.2.jar)
-    * [jackson-databind-2.9.9.3.jar](https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.9.9.3/jackson-databind-2.9.9.3.jar)
+  * [java-jwt-3.9.0.jar](https://repo1.maven.org/maven2/com/auth0/java-jwt/3.9.0/java-jwt-3.9.0.jar)
+    * [jackson-databind-2.10.1.jar](https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.10.1/jackson-databind-2.10.1.jar) (this may *cause problems* with [some Tomcat version](https://stackoverflow.com/questions/23541532/org-apache-tomcat-util-bcel-classfile-classformatexception-invalid-byte-tag-in))
+      * [jackson-core-2.10.1.jar](https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-core/2.10.1/jackson-core-2.10.1.jar)
+      * [jackson-annotations-2.10.1.jar](https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.10.1/jackson-annotations-2.10.1.jar)
     * [commons-codec-1.12.jar](https://repo1.maven.org/maven2/commons-codec/commons-codec/1.12/commons-codec-1.12.jar)
+    
+If you need to use OpenID Connect valve (`OidcJwtTokenValve`), you need further dependencies:
+
+  * [jwks-rsa-0.9.0.jar](https://repo1.maven.org/maven2/com/auth0/jwks-rsa/0.9.0/jwks-rsa-0.9.0.jar)
+    * [guava-27.1-jre.jar](https://repo1.maven.org/maven2/com/google/guava/guava/27.1-jre/guava-27.1-jre.jar)
+      * [failureaccess-1.0.1.jar](https://repo1.maven.org/maven2/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar)
 
 and place into *TOMCAT_HOME/lib* directory
 
@@ -36,7 +46,7 @@ mvn install
 and grab artifacts from *target/to-deploy* folder. Copy generated artifacts into *TOMCAT_HOME/lib* directory
 
 ## 2. Register Valve
-Now it's time to register the valve. According to your signing method or token provider, from version 3.0.0 you can choose proper valve:
+Now it's time to register the valve. According to your signing method or token provider, from version 3.0.0 you can choose proper valve, according to your scenario:
 
  * `HmacJwtTokenValve`: to be used when tokens are signed with **HMAC**, based on a **pre-shared secret text**.
    Configurable parameters are:
@@ -53,9 +63,9 @@ Now it's time to register the valve. According to your signing method or token p
    
    ```xml
    <Valve className="it.cosenonjaviste.security.jwt.valves.HmacJwtTokenValve" 
-   	  		 secret="my super secret password"
-   	  		 updateExpire="true"
-   	  		 cookieName="auth" />
+         secret="my super secret password"
+         updateExpire="true"
+         cookieName="auth" />
    ```
      
  * `RsaJwtTokenValve`: to be used when tokens are signed with **RSA**, based on certificates pairs.
@@ -82,7 +92,28 @@ Now it's time to register the valve. According to your signing method or token p
                  customUserIdClaim="sub" 
                  customRolesClaim="authorities" />
       ```
-
+   
+ * `OidcJwtTokenValve`: to be used when tokens provided by an OpenID Connect Identity Provider (OIDC IDP).
+   Configurable parameters are:
+     
+     | Parameter | Type | Mandatory | Default | Description |
+     | --- | --- | --- | --- | --- |
+     | `issuerUrl` | URL | Y | | URL where to retrieve IDP keys: it's `jwks_uri` key of `.well-known/openid-configuration` endpoint provided by your IDP  | 
+     | `supportedAudiences` | String | N | | Allowed `aud` values in token. If `supportedAudiences` is not set, no validation is performed |
+     | `expiresIn` | Integer | N | 60 | Keys duration cache before recontact IDP for keys |
+     | `timeUnit` | TimeUnit | N | MINUTES | Cache time unit. Allowed values are: `NANOSECONDS`, `MICROSECONDS`, `MILLISECONDS`, `SECONDS`, `MINUTES`, `HOURS`, `DAYS` |
+     | `customUserIdClaim` | String | N | `sub` | Claim that identify the user id |
+     | `customRolesClaim`| String | N | `authorities` | Claim that identify user capabilities |
+     
+   Example 
+   
+   ```xml
+   <Valve className="it.cosenonjaviste.security.jwt.valves.OidcJwtTokenValve" 
+   	  		 issuerUrl="http://idp.example.com/openid-connect/certs"
+             expiresIn="30"
+   	  		 timeUnit="MINUTES" />
+   ```
+    
 Valves can be configured in Tomcat in:
 * `server.xml` for registering valve at **Engine** or **Host** level (for SSO purpose)
 * `context.xml` for registering valve at application **Context** level
