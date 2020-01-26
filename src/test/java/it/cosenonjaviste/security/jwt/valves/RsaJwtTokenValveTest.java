@@ -25,6 +25,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
+import java.util.TimeZone;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
@@ -60,6 +61,8 @@ public class RsaJwtTokenValveTest {
 
     @Before
     public void setUp() throws LifecycleException {
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+
         jwtValve.setContainer(container);
         jwtValve.setNext(nextValve);
         jwtValve.setKeystorePath("target/test-classes/" + KeyStores.KEYSTORE);
@@ -277,7 +280,7 @@ public class RsaJwtTokenValveTest {
         jwtValve.invoke(request, response);
 
         verify(request).getHeader(JwtConstants.AUTH_HEADER);
-        verify(response).sendError(401, "Token not valid. Cause: The Token has expired on Tue Jan 01 14:21:00 CET 2019.");
+        verify(response).sendError(401, "Token not valid. Cause: The Token has expired on Tue Jan 01 13:21:00 UTC 2019.");
     }
 
     /**
