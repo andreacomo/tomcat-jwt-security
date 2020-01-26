@@ -102,7 +102,19 @@ public class JwtTokenVerifier {
 	 * @return {@link JwtAdapter}
 	 */
 	public JwtAdapter verify(String token) {
-		DecodedJWT decodedJWT = JWT.decode(token);
+		return verify(JWT.decode(token));
+	}
+
+	/**
+	 * Verify provided token delegating verification logic to proper strategy of {@link VerifierStrategy}
+	 *
+	 * @param decodedJWT decoded JWT token
+	 *
+	 * @throws JWTVerificationException if validation fails
+	 *
+	 * @return {@link JwtAdapter}
+	 */
+	public JwtAdapter verify(DecodedJWT decodedJWT) {
 		Algorithm algorithm = verifierStrategy.verify(decodedJWT);
 		return new JwtAdapter(algorithm, decodedJWT, customUserIdClaim, customRolesClaim);
 	}

@@ -46,12 +46,14 @@
 		<to.deploy.dir>${project.build.directory}/to-deploy</to.deploy.dir>
 
 		<tomcat.version>8.0.28</tomcat.version>
-		<jwt.version>3.8.2</jwt.version>
+		<jwt.version>3.9.0</jwt.version>
 		<!-- Jackson version taken from JWT pom -->
-		<jackson.version>2.9.9.3</jackson.version>
+		<jackson.version>2.10.0.pr3</jackson.version>
 		<commons.codec.version>1.4</commons.codec.version>
 		<junit.version>4.12</junit.version>
 		<mockito.version>1.10.19</mockito.version>
+		<jwks-rsa.version>0.9.0</jwks-rsa.version>
+		<mockserver.version>5.8.1</mockserver.version>
 	</properties>
 
 	<dependencies>
@@ -73,6 +75,11 @@
 			<version>${jwt.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>jwks-rsa</artifactId>
+			<version>${jwks-rsa.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>${jackson.version}</version>
@@ -87,6 +94,12 @@
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
 			<version>${mockito.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mock-server</groupId>
+			<artifactId>mockserver-netty</artifactId>
+			<version>${mockserver.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
