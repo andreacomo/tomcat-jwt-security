@@ -82,7 +82,7 @@ public class OidcJwtTokenValveTest {
 
         jwtValve.setContainer(container);
         jwtValve.setNext(nextValve);
-        jwtValve.setIssuerUri("http://localhost:" + mockServerRule.getPort() + OIDC_KEYS);
+        jwtValve.setIssuerUrl("http://localhost:" + mockServerRule.getPort() + OIDC_KEYS);
         jwtValve.setCustomUserIdClaim("preferred_username");
         jwtValve.setCustomRolesClaim("authorities");
 

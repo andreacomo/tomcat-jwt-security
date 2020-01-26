@@ -58,6 +58,8 @@ public class OidcJwtTokenValve extends AbstractJwtTokenValve {
         this.supportedAudiences = Collections.emptySet();
         this.expiresIn = 60;
         this.timeUnit = TimeUnit.MINUTES;
+        this.customUserIdClaim = PublicClaims.SUBJECT;
+        this.customRolesClaim = "authorities";
     }
 
     @Override
@@ -144,7 +146,7 @@ public class OidcJwtTokenValve extends AbstractJwtTokenValve {
         }
     }
 
-    public void setIssuerUri(String issuerUrl) throws MalformedURLException {
+    public void setIssuerUrl(String issuerUrl) throws MalformedURLException {
         this.issuerUrl = new URL(issuerUrl);
     }
 
