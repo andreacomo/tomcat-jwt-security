@@ -4,6 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import it.cosenonjaviste.security.jwt.model.JwtAdapter;
+import it.cosenonjaviste.security.jwt.utils.verifiers.JwtTokenVerifier;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -17,7 +19,7 @@ public class JwtTokenBuilderTest {
     private static final String SECRET = "my secret";
 
     @Test
-    public void shouldContains5Claims() throws Exception {
+    public void shouldContains5Claims() {
         String token = createToken();
 
         assertNotNull(token);
@@ -40,12 +42,12 @@ public class JwtTokenBuilderTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void shouldBeEmptyAndInvalid() throws Exception {
-        JwtTokenBuilder.create(SECRET).build();
+    public void shouldBeEmptyAndInvalid() {
+        JwtTokenBuilder.create(Algorithm.HMAC256(SECRET)).build();
     }
 
     @Test
-    public void shouldParseJwtFromString() throws Exception {
+    public void shouldParseJwtFromString() {
         String token = createToken();
 
         assertNotNull(token);
@@ -66,13 +68,6 @@ public class JwtTokenBuilderTest {
         assertTrue(nbf < now);
     }
 
-
-    @Test(expected = IllegalStateException.class)
-    public void shouldThrowIllegalStateException() throws Exception {
-        JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
-        JwtTokenBuilder.from(verifier, SECRET);
-    }
-
     @Test
     public void shouldIncreaseExpireTime() throws Exception {
         String token = createToken();
@@ -81,14 +76,15 @@ public class JwtTokenBuilderTest {
 
         TimeUnit.SECONDS.sleep(2);
 
-        token = JwtTokenBuilder.from(verifier, SECRET).build();
+        token = JwtTokenBuilder.from(token, SECRET).build();
         verifier = JwtTokenVerifier.create(SECRET);
         int secondExpire = getExp(verifier, token);
 
         assertTrue(secondExpire >= firstExpire + 2);
 
-        assertEquals("test", verifier.getUserId());
-        assertEquals(Arrays.asList("role1", "role2"), verifier.getRoles());
+        JwtAdapter jwtAdapter = verifier.verify(token);
+        assertEquals("test", jwtAdapter.getUserId());
+        assertEquals(Arrays.asList("role1", "role2"), jwtAdapter.getRoles());
     }
 
     @Test
@@ -96,8 +92,8 @@ public class JwtTokenBuilderTest {
         String token = createToken();
 
         JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
-        verifier.verify(token);
-        Integer nbf = verifier.getDecodedJWT().getClaim("nbf").asInt();
+        JwtAdapter jwtAdapter = verifier.verify(token);
+        Integer nbf = jwtAdapter.getDecodedJWT().getClaim("nbf").asInt();
         Integer exp = getExp(verifier, token);
 
         assertNotNull(nbf);
@@ -106,41 +102,41 @@ public class JwtTokenBuilderTest {
         assertNotNull(exp);
         assertTrue(nowInSecs < exp);
 
-        JwtTokenBuilder tokenBuilder = JwtTokenBuilder.from(verifier, SECRET);
+        JwtTokenBuilder tokenBuilder = JwtTokenBuilder.from(token, SECRET);
         String recreatedToken = tokenBuilder.build();
 
         verifier = JwtTokenVerifier.create(SECRET);
-        verifier.verify(recreatedToken);
-        Integer recreatedNbf = verifier.getDecodedJWT().getClaim("nbf").asInt();
+        jwtAdapter = verifier.verify(recreatedToken);
+        Integer recreatedNbf = jwtAdapter.getDecodedJWT().getClaim("nbf").asInt();
         Integer recreatedExp = getExp(verifier, token);
 
         assertEquals(exp, recreatedExp);
         assertEquals((float) nbf, (float) recreatedNbf, 1);
 
-        assertEquals("test", verifier.getUserId());
-        assertEquals(Arrays.asList("role1", "role2"), verifier.getRoles());
+        assertEquals("test", jwtAdapter.getUserId());
+        assertEquals(Arrays.asList("role1", "role2"), jwtAdapter.getRoles());
     }
 
     @Test
-    public void shouldKeepAlgorithmFromVerifier() throws Exception {
+    public void shouldKeepAlgorithmFromVerifier() {
         Algorithm algorithm = Algorithm.HMAC512(SECRET);
         String token = createToken(algorithm);
-        JwtTokenVerifier verifier = JwtTokenVerifier.create(algorithm);
+        JwtTokenVerifier verifier = JwtTokenVerifier.create(SECRET);
         verifier.verify(token);
 
-        token = JwtTokenBuilder.from(verifier, SECRET).build();
+        token = JwtTokenBuilder.from(token, SECRET).build();
 
         assertEquals("HS512", JWT.decode(token).getAlgorithm());
     }
 
     private int getExp(JwtTokenVerifier verifier, String token) {
-        verifier.verify(token);
-        DecodedJWT claims = verifier.getDecodedJWT();
+        JwtAdapter jwtAdapter = verifier.verify(token);
+        DecodedJWT claims = jwtAdapter.getDecodedJWT();
         return claims.getClaim("exp").asInt();
     }
 
     private String createToken() {
-        return JwtTokenBuilder.create(SECRET)
+        return JwtTokenBuilder.create(Algorithm.HMAC256(SECRET))
                 .userId("test")
                 .roles(Arrays.asList("role1", "role2"))
                 .expirySecs(10000)

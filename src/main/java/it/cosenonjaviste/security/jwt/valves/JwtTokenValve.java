@@ -1,21 +1,20 @@
 package it.cosenonjaviste.security.jwt.valves;
 
-import it.cosenonjaviste.security.jwt.catalinawriters.ResponseWriter;
-import it.cosenonjaviste.security.jwt.model.AuthErrorResponse;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import it.cosenonjaviste.security.jwt.model.JwtAdapter;
 import it.cosenonjaviste.security.jwt.utils.JwtConstants;
-import it.cosenonjaviste.security.jwt.utils.JwtTokenBuilder;
-import it.cosenonjaviste.security.jwt.utils.JwtTokenVerifier;
+import it.cosenonjaviste.security.jwt.utils.verifiers.JwtTokenVerifier;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.realm.GenericPrincipal;
-import org.apache.catalina.valves.ValveBase;
-import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.file.attribute.UserPrincipal;
+import java.util.stream.Stream;
 
 /**
  * Perform a JWT authentication on requester resource.
@@ -33,64 +32,53 @@ import java.nio.file.attribute.UserPrincipal;
  * @author acomo
  *
  */
-public class JwtTokenValve extends ValveBase {
+public abstract class JwtTokenValve extends AbstractJwtTokenValve {
 
-	private String secret;
-	
-	private boolean updateExpire;
-	
+	private static final Log LOG = LogFactory.getLog(JwtTokenValve.class);
+
+	private JwtTokenVerifier tokenVerifier;
+
 	private String cookieName;
 
 	@Override
-	public void invoke(Request request, Response response) throws IOException,
-			ServletException {
-
-		SecurityConstraint[] constraints = this.container.getRealm()
-				.findSecurityConstraints(request, request.getContext());
-
-		if ((constraints == null && !request.getContext().getPreemptiveAuthentication())
-				|| !hasAuthConstraint(constraints)) {
-			this.getNext().invoke(request, response); 
-		} else {
-			handleAuthentication(request, response);
-		}
-
+	protected void initInternal() throws LifecycleException {
+		super.initInternal();
+		this.tokenVerifier = createTokenVerifier(customUserIdClaim, customRolesClaim);
 	}
 
-	private boolean hasAuthConstraint(SecurityConstraint[] constraints) {
-		if (constraints != null) {
-			boolean authConstraint = true;
-			for (SecurityConstraint securityConstraint : constraints) {
-				authConstraint &= securityConstraint.getAuthConstraint();
-			}
-			return authConstraint;
-		} else {
-			return false;
-		}
+	/**
+	 * Creates a {@link JwtTokenVerifier} instance from keystore
+	 *
+	 * @param customUserIdClaim claim to use for identifying user id
+	 * @param customRolesClaim claim to use fot identifies user roles
+	 *
+	 * @return {@link JwtTokenVerifier} instance
+	 */
+	protected abstract JwtTokenVerifier createTokenVerifier(String customUserIdClaim, String customRolesClaim);
 
-	}
-
-	private void handleAuthentication(Request request, Response response)
+	@Override
+	protected void handleAuthentication(Request request, Response response)
 			throws IOException, ServletException {
 
 		String token = getToken(request);
 		if (token != null) {
-			JwtTokenVerifier tokenVerifier = JwtTokenVerifier.create(secret);
-			if (tokenVerifier.verify(token)) {
-				request.setUserPrincipal(createPrincipalFromToken(tokenVerifier));
-				request.setAuthType("TOKEN");
-				if (this.updateExpire) {
-					updateToken(tokenVerifier, response);
-				}
+			try {
+				JwtAdapter jwt = tokenVerifier.verify(token);
+				authenticateRequest(request, jwt);
+				beforeNext(response, jwt);
 				this.getNext().invoke(request, response);
-			} else {
-				sendUnauthorizedError(request, response, "Token not valid. Please login first");
+			} catch (JWTVerificationException e) {
+				LOG.error(e.getMessage());
+				sendUnauthorizedError(request, response, "Token not valid. Cause: " + e.getMessage());
 			}
 		} else {
 			sendUnauthorizedError(request, response, "Please login first");
 		}
 	}
-	
+
+	protected void beforeNext(Response response, JwtAdapter jwt) {
+	}
+
 	private String getCookieValueByName(Request request, String name){
 		if (name == null) {
 			return null;
@@ -98,11 +86,11 @@ public class JwtTokenValve extends ValveBase {
 
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
-			for (Cookie cookie : cookies) {
-				if (cookie.getName().equalsIgnoreCase(name)) {
-					return cookie.getValue();
-				}
-			}
+			return Stream.of(cookies)
+					.filter(cookie -> cookie.getName().equalsIgnoreCase(name))
+					.findFirst()
+					.map(Cookie::getValue)
+					.orElse(null);
 		}
 	    return null;
 	}
@@ -135,33 +123,8 @@ public class JwtTokenValve extends ValveBase {
 		}
 	}
 
-	private void updateToken(JwtTokenVerifier tokenVerifier, Response response) {
-		String newToken = JwtTokenBuilder.from(tokenVerifier).build();
-		response.setHeader(JwtConstants.AUTH_HEADER, newToken);
-	}
-
-	private GenericPrincipal createPrincipalFromToken(JwtTokenVerifier tokenVerifier) {
-		return new GenericPrincipal(tokenVerifier.getUserId(), null, tokenVerifier.getRoles());
-	}
-
-	protected void sendUnauthorizedError(Request request, Response response, String message) throws IOException {
-		ResponseWriter.get(request.getHeader("accept")).write(response, HttpServletResponse.SC_UNAUTHORIZED, new AuthErrorResponse(message));
-	}
-
-	public void setSecret(String secret) {
-		this.secret = secret;
-	}
-	
-	/**
-	 * Updates expire time on each request
-	 * 
-	 * @param updateExpire true to enable token update on each request
-	 */
-	public void setUpdateExpire(boolean updateExpire) {
-		this.updateExpire = updateExpire;
-	}
-
 	public void setCookieName(String cookieName) {
 		this.cookieName = cookieName;
 	}
+
 }
