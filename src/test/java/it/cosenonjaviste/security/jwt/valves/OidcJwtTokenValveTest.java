@@ -33,6 +33,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
@@ -159,6 +160,25 @@ public class OidcJwtTokenValveTest {
         jwtValve.invoke(request, response);
 
         verifyOidcServerInvokedExactly(1);
+    }
+
+    @Test
+    public void shouldRetrieveKeysTwice() throws Exception {
+        mockSecurityConstraints();
+        when(request.getHeader("Authorization")).thenReturn(
+                "Bearer " + getTestToken());
+        setupOidcServer();
+        jwtValve.setExpiresIn(1);
+        jwtValve.setTimeUnit("SECONDS");
+        jwtValve.initInternal();
+
+        jwtValve.invoke(request, response);
+
+        TimeUnit.SECONDS.sleep(2);
+
+        jwtValve.invoke(request, response);
+
+        verifyOidcServerInvokedExactly(2);
     }
 
     @Test
