@@ -199,7 +199,8 @@ response.addHeader(JwtConstants.AUTH_HEADER, token);
 ```
 
 ## OpenID Connect
-In case of `OidcJwtTokenValve`, you *don't need a login controller*: just set your JWT token in every HTTP header `Authorization`, preceded by `Bearer`.
+In case of `OidcJwtTokenValve`, you *don't need a login controller*, since you are just protecting your APIs as [OAuth2 Resource Server](https://www.oauth.com/oauth2-servers/the-resource-server/). 
+Authentication is handled elsewhere to gather the JWT: just configure the valve and send obtained JWT token in every HTTP header `Authorization`, preceded by `Bearer`.
 
 Enjoy now your stateless security system on Tomcat!!
 
