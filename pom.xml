@@ -45,7 +45,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<to.deploy.dir>${project.build.directory}/to-deploy</to.deploy.dir>
 
-		<tomcat.version>8.0.28</tomcat.version>
+		<tomcat.version>8.5.9</tomcat.version>
 		<jwt.version>3.9.0</jwt.version>
 		<!-- Jackson version taken from JWT pom and updated -->
 		<jackson.version>2.10.1</jackson.version>
