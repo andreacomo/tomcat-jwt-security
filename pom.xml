@@ -48,7 +48,7 @@
 		<tomcat.version>8.0.28</tomcat.version>
 		<jwt.version>3.9.0</jwt.version>
 		<!-- Jackson version taken from JWT pom and updated -->
-		<jackson.version>2.10.1</jackson.version>
+		<jackson.version>2.13.4.1</jackson.version>
 		<commons.codec.version>1.4</commons.codec.version>
 		<junit.version>4.13.1</junit.version>
 		<mockito.version>1.10.19</mockito.version>
