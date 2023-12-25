@@ -1,0 +1,233 @@
+repo_name: andreacomo/tomcat-jwt-security
+report_id: b5c4bc345ae99cd61dfe2fdcff2899d4
+version: 0.1
+repo_type: Public
+timestamp: '2023-12-25T20:40:05+00:00'
+requested_by: andreacomo
+provider: github
+branch: master
+detected_tools_count: 12
+tools:
+- name: Java
+  description: A concurrent, class-based, object-oriented, language specifically designed
+    to have as few implementation dependencies as possible
+  website_url: https://www.java.com
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/995/K85ZWV2F.png
+  detection_source: Repo Metadata
+- name: Git
+  description: Fast, scalable, distributed revision control system
+  website_url: http://git-scm.com/
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Version Control System
+  image_url: https://img.stackshare.io/service/1046/git.png
+  detection_source: Repo Metadata
+- name: JUnit
+  description: A programmer-oriented testing framework for Java
+  website_url: http://junit.org/
+  version: 4.13.1
+  license: EPL-1.0
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Testing Frameworks
+  image_url: https://img.stackshare.io/service/2020/874086.png
+  detection_source_url: https://github.com/andreacomo/tomcat-jwt-security/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: acomo_omnia
+  last_updated_on: 2014-12-26 14:30:25.000000000 Z
+- name: Mockito
+  description: Tasty mocking framework for unit tests in Java
+  website_url: https://site.mockito.org/
+  version: 1.10.19
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Testing Frameworks
+  image_url: https://img.stackshare.io/service/2021/4y634TJm_400x400.jpg
+  detection_source_url: https://github.com/andreacomo/tomcat-jwt-security/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: andrea.como
+  last_updated_on: 2015-09-06 23:55:48.000000000 Z
+- name: Travis CI
+  description: A hosted continuous integration service for open source and private
+    projects
+  website_url: http://travis-ci.com/
+  open_source: false
+  hosted_saas: true
+  category: Build, Test, Deploy
+  sub_category: Continuous Integration
+  image_url: https://img.stackshare.io/service/460/Lu6cGu0z_400x400.png
+  detection_source: ".travis.yml"
+  last_updated_by: andrea.como
+  last_updated_on: 2019-08-24 19:32:12.000000000 Z
+- name: com.auth0:java-jwt
+  description: Java implementation of JSON Web Token
+  version: 3.9.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/andreacomo/tomcat-jwt-security/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: andrea.como
+  last_updated_on: 2020-01-26 16:23:58.000000000 Z
+- name: com.fasterxml.jackson.core:jackson-databind
+  description: 'General data-binding functionality for Jackson: works on core streaming
+    API'
+  version: 2.10.1
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/andreacomo/tomcat-jwt-security/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: andrea.como
+  last_updated_on: 2020-01-26 22:48:28.000000000 Z
+  vulnerabilities:
+  - name: Deeply nested json in jackson-databind
+    cve_id: CVE-2020-36518
+    cve_url: https://github.com/advisories/GHSA-57j2-w4cx-62h2
+    detected_date: Mar 23
+    severity: high
+    first_patched: 2.12.6.1
+  - name: XML External Entity (XXE) Injection in Jackson Databind
+    cve_id: CVE-2020-25649
+    cve_url: https://github.com/advisories/GHSA-288c-cq4h-88gq
+    detected_date: Aug 22
+    severity: high
+    first_patched: 2.10.5.1
+  - name: Uncontrolled Resource Consumption in FasterXML jackson-databind
+    cve_id: CVE-2022-42004
+    cve_url: https://github.com/advisories/GHSA-rgv9-q543-rqg4
+    detected_date: Oct 5
+    severity: high
+    first_patched: 2.12.7.1
+  - name: jackson-databind possible Denial of Service if using JDK serialization to
+      serialize JsonNode
+    cve_id: CVE-2021-46877
+    cve_url: https://github.com/advisories/GHSA-3x8x-79m2-3w2w
+    detected_date: Mar 21
+    severity: high
+    first_patched: 2.12.6
+  - name: Uncontrolled Resource Consumption in Jackson-databind
+    cve_id: CVE-2022-42003
+    cve_url: https://github.com/advisories/GHSA-jjjh-jjxp-wpff
+    detected_date: Oct 5
+    severity: high
+    first_patched: 2.12.7.1
+- name: junit:junit
+  description: JUnit is a unit testing framework for Java
+  version: 4.13.1
+  license: EPL-1.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/andreacomo/tomcat-jwt-security/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: dependabot[bot]
+  last_updated_on: 2020-10-13 07:18:53.000000000 Z
+- name: org.apache.tomcat:tomcat-catalina
+  description: Tomcat Servlet Engine Core Classes and Standard implementations
+  version: 8.0.28
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/andreacomo/tomcat-jwt-security/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: andrea.como
+  last_updated_on: 2020-01-26 16:23:58.000000000 Z
+  vulnerabilities:
+  - name: Authentication Bypass Using an Alternate Path or Channel in Apache Tomcat
+    cve_id: CVE-2016-5018
+    cve_url: https://github.com/advisories/GHSA-4v3g-g84w-hv7r
+    detected_date: Jul 7
+    severity: critical
+    first_patched: 8.0.37
+  - name: Potential remote code execution in Apache Tomcat
+    cve_id: CVE-2020-9484
+    cve_url: https://github.com/advisories/GHSA-344f-f5vg-2jfj
+    detected_date: Sep 27
+    severity: high
+    first_patched: 8.5.55
+  - name: Concurrent Execution using Shared Resource with Improper Synchronization
+      in Apache Tomcat
+    cve_id: CVE-2016-8745
+    cve_url: https://github.com/advisories/GHSA-w3j5-q8f2-3cqq
+    detected_date: Jul 7
+    severity: high
+    first_patched: 8.0.41
+  - name: Improper Access Control in Apache Tomcat
+    cve_id: CVE-2016-5388
+    cve_url: https://github.com/advisories/GHSA-v646-rx6w-r3qq
+    detected_date: Jul 7
+    severity: high
+    first_patched: 8.5.5
+  - name: Incorrect Authorization in Apache Tomcat
+    cve_id: CVE-2016-6797
+    cve_url: https://github.com/advisories/GHSA-q6x7-f33r-3wxx
+    detected_date: Jul 7
+    severity: high
+    first_patched: 8.0.37
+- name: org.apache.tomcat:tomcat-coyote
+  description: Tomcat Connectors and HTTP parser
+  version: 8.0.28
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/andreacomo/tomcat-jwt-security/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: andrea.como
+  last_updated_on: 2020-01-26 16:23:58.000000000 Z
+  vulnerabilities:
+  - name: Improper Input Validation in Apache Tomcat
+    cve_id: CVE-2016-6816
+    cve_url: https://github.com/advisories/GHSA-jc7p-5r39-9477
+    detected_date: Sep 27
+    severity: high
+    first_patched: 8.0.39
+- name: org.mock-server:mockserver-netty
+  description: A simple server to support mocking responses from any server / service
+    that uses HTTP
+  version: 5.8.1
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/andreacomo/tomcat-jwt-security/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: andrea.como
+  last_updated_on: 2020-01-26 16:23:58.000000000 Z
+- name: org.mockito:mockito-core
+  description: Mockito mock objects library core API and implementation
+  version: 1.10.19
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/andreacomo/tomcat-jwt-security/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: andrea.como
+  last_updated_on: 2020-01-26 16:23:58.000000000 Z
