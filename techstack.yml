@@ -2,7 +2,7 @@ repo_name: andreacomo/tomcat-jwt-security
 report_id: b5c4bc345ae99cd61dfe2fdcff2899d4
 version: 0.1
 repo_type: Public
-timestamp: '2024-01-05T08:15:23+00:00'
+timestamp: '2024-02-29T19:11:40+00:00'
 requested_by: andreacomo
 provider: github
 branch: master
@@ -98,24 +98,18 @@ tools:
   last_updated_by: andrea.como
   last_updated_on: 2020-01-26 22:48:28.000000000 Z
   vulnerabilities:
-  - name: Deeply nested json in jackson-databind
-    cve_id: CVE-2020-36518
-    cve_url: https://github.com/advisories/GHSA-57j2-w4cx-62h2
-    detected_date: Mar 23
-    severity: high
-    first_patched: 2.12.6.1
-  - name: XML External Entity (XXE) Injection in Jackson Databind
-    cve_id: CVE-2020-25649
-    cve_url: https://github.com/advisories/GHSA-288c-cq4h-88gq
-    detected_date: Aug 22
-    severity: high
-    first_patched: 2.10.5.1
   - name: Uncontrolled Resource Consumption in FasterXML jackson-databind
     cve_id: CVE-2022-42004
     cve_url: https://github.com/advisories/GHSA-rgv9-q543-rqg4
     detected_date: Oct 5
     severity: high
     first_patched: 2.12.7.1
+  - name: XML External Entity (XXE) Injection in Jackson Databind
+    cve_id: CVE-2020-25649
+    cve_url: https://github.com/advisories/GHSA-288c-cq4h-88gq
+    detected_date: Aug 22
+    severity: high
+    first_patched: 2.10.5.1
   - name: jackson-databind possible Denial of Service if using JDK serialization to
       serialize JsonNode
     cve_id: CVE-2021-46877
@@ -129,6 +123,12 @@ tools:
     detected_date: Oct 5
     severity: high
     first_patched: 2.12.7.1
+  - name: Deeply nested json in jackson-databind
+    cve_id: CVE-2020-36518
+    cve_url: https://github.com/advisories/GHSA-57j2-w4cx-62h2
+    detected_date: Mar 23
+    severity: high
+    first_patched: 2.12.6.1
 - name: junit:junit
   description: JUnit is a unit testing framework for Java
   version: 4.13.1
@@ -168,6 +168,12 @@ tools:
     detected_date: Sep 27
     severity: high
     first_patched: 8.5.55
+  - name: Improper Access Control in Apache Tomcat
+    cve_id: CVE-2016-5388
+    cve_url: https://github.com/advisories/GHSA-v646-rx6w-r3qq
+    detected_date: Jul 7
+    severity: high
+    first_patched: 8.5.5
   - name: Concurrent Execution using Shared Resource with Improper Synchronization
       in Apache Tomcat
     cve_id: CVE-2016-8745
@@ -175,12 +181,6 @@ tools:
     detected_date: Jul 7
     severity: high
     first_patched: 8.0.41
-  - name: Improper Access Control in Apache Tomcat
-    cve_id: CVE-2016-5388
-    cve_url: https://github.com/advisories/GHSA-v646-rx6w-r3qq
-    detected_date: Jul 7
-    severity: high
-    first_patched: 8.5.5
   - name: Incorrect Authorization in Apache Tomcat
     cve_id: CVE-2016-6797
     cve_url: https://github.com/advisories/GHSA-q6x7-f33r-3wxx
