@@ -30,7 +30,7 @@ Full tech stack [here](/techstack.md)
 # Tech Stack File
 ![](https://img.stackshare.io/repo.svg "repo") [andreacomo/tomcat-jwt-security](https://github.com/andreacomo/tomcat-jwt-security)![](https://img.stackshare.io/public_badge.svg "public")
 <br/><br/>
-|12<br/>Tools used|01/05/24 <br/>Report generated|
+|12<br/>Tools used|02/29/24 <br/>Report generated|
 |------|------|
 </div>
 
@@ -92,9 +92,9 @@ Full tech stack [here](/techstack.md)
 |NAME|VERSION|LAST UPDATED|LAST UPDATED BY|LICENSE|VULNERABILITIES|
 |:------|:------|:------|:------|:------|:------|
 |[com.auth0:java-jwt](https://github.com/auth0/java-jwt)|v3.9.0|01/26/20|andrea.como |MIT|N/A|
-|[com.fasterxml.jackson.core:jackson-databind](http://github.com/FasterXML/jackson)|v2.10.1|01/26/20|andrea.como |Apache-2.0|[CVE-2020-36518](https://github.com/advisories/GHSA-57j2-w4cx-62h2) (High)<br/>[CVE-2020-25649](https://github.com/advisories/GHSA-288c-cq4h-88gq) (High)<br/>[CVE-2022-42004](https://github.com/advisories/GHSA-rgv9-q543-rqg4) (High)<br/>[CVE-2021-46877](https://github.com/advisories/GHSA-3x8x-79m2-3w2w) (High)<br/>[CVE-2022-42003](https://github.com/advisories/GHSA-jjjh-jjxp-wpff) (High)|
+|[com.fasterxml.jackson.core:jackson-databind](http://github.com/FasterXML/jackson)|v2.10.1|01/26/20|andrea.como |Apache-2.0|[CVE-2022-42004](https://github.com/advisories/GHSA-rgv9-q543-rqg4) (High)<br/>[CVE-2020-25649](https://github.com/advisories/GHSA-288c-cq4h-88gq) (High)<br/>[CVE-2021-46877](https://github.com/advisories/GHSA-3x8x-79m2-3w2w) (High)<br/>[CVE-2022-42003](https://github.com/advisories/GHSA-jjjh-jjxp-wpff) (High)<br/>[CVE-2020-36518](https://github.com/advisories/GHSA-57j2-w4cx-62h2) (High)|
 |[junit:junit](http://junit.org)|v4.13.1|10/13/20|dependabot[bot] |EPL-1.0|N/A|
-|[org.apache.tomcat:tomcat-catalina](https://tomcat.apache.org/)|v8.0.28|01/26/20|andrea.como |Apache-2.0|[CVE-2016-5018](https://github.com/advisories/GHSA-4v3g-g84w-hv7r) (Critical)<br/>[CVE-2020-9484](https://github.com/advisories/GHSA-344f-f5vg-2jfj) (High)<br/>[CVE-2016-8745](https://github.com/advisories/GHSA-w3j5-q8f2-3cqq) (High)<br/>[CVE-2016-5388](https://github.com/advisories/GHSA-v646-rx6w-r3qq) (High)<br/>[CVE-2016-6797](https://github.com/advisories/GHSA-q6x7-f33r-3wxx) (High)|
+|[org.apache.tomcat:tomcat-catalina](https://tomcat.apache.org/)|v8.0.28|01/26/20|andrea.como |Apache-2.0|[CVE-2016-5018](https://github.com/advisories/GHSA-4v3g-g84w-hv7r) (Critical)<br/>[CVE-2020-9484](https://github.com/advisories/GHSA-344f-f5vg-2jfj) (High)<br/>[CVE-2016-5388](https://github.com/advisories/GHSA-v646-rx6w-r3qq) (High)<br/>[CVE-2016-8745](https://github.com/advisories/GHSA-w3j5-q8f2-3cqq) (High)<br/>[CVE-2016-6797](https://github.com/advisories/GHSA-q6x7-f33r-3wxx) (High)|
 |[org.apache.tomcat:tomcat-coyote](https://tomcat.apache.org/)|v8.0.28|01/26/20|andrea.como |Apache-2.0|[CVE-2016-6816](https://github.com/advisories/GHSA-jc7p-5r39-9477) (High)|
 |[org.mock-server:mockserver-netty](http://www.mock-server.com)|v5.8.1|01/26/20|andrea.como |Apache-2.0|N/A|
 |[org.mockito:mockito-core](https://github.com/mockito/mockito)|v1.10.19|01/26/20|andrea.como |MIT|N/A|
